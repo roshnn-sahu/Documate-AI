@@ -55,6 +55,8 @@ import {
   ChevronsUpDownIcon,
   ChevronRightIcon,
 } from "lucide-react";
+import { HeroGradient } from "../hero-gradient";
+import AiInput from "@/components/chat/ai-input"
 
 export function ChatSidebar() {
   const data = {
@@ -179,12 +181,10 @@ export function ChatSidebar() {
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            <SidebarMenuItem>             
                   <SidebarMenuButton
                     size="lg"
-                    className="data-open:bg-sidebar-accent data-open:text-sidebar-accent-foreground"
+                    className="data-open:bg-white data-open:text-black"
                   >
                     <Button size="icon-sm" asChild className="size-8">
                       <span>
@@ -225,12 +225,11 @@ export function ChatSidebar() {
                       <span className="truncate text-xs">{data.company.plan}</span>
                     </div>
                    
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-              </DropdownMenu>
+                  </SidebarMenuButton>              
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
+
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -348,18 +347,21 @@ export function ChatSidebar() {
       </Sidebar>
       {/* chat section */}
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="flex relative z-10 bg-white h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
+        <div className="flex flex-1 flex-col items-center gap-4 p-4">
+    <HeroGradient/>
+    <div className="h-full w-full flex flex-col justify-center items-center ">
+
+    <div className="flex flex-col justify-center items-center relative z-10 mb-6  ">
+    <h2 className="text-3xl font-bold mb-3">How can i assist you?</h2>
+    <p className="text-md text-neutral-600">Quickly fins answers, get assistance, and explore AI-powered insights-all in one place</p>
+    </div>
+    <AiInput/>
+    </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

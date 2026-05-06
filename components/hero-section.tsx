@@ -8,6 +8,7 @@ import {
   PieChart,
   Home,
   MoreVertical,
+  Bot,
 } from "lucide-react";
 import { HeroGradient } from "./hero-gradient";
 import { Badge } from "./ui/badge";
@@ -15,8 +16,11 @@ import { Badge } from "./ui/badge";
 const heroSection = () => {
   return (
     <main className="relative z-10 flex flex-col items-center pt-[180px] pb-32  rounded-2xl mx-auto  overflow-hidden">
-          <HeroGradient />
-          <Badge  className="bg-red-500 text-black h-6 px-3 py-1 text-base">Ai Chatbot</Badge>
+      <HeroGradient />
+      <Badge className="bg-linear-to-br from-rose-400 to-orange-400">
+        AI Chatbot <Bot className="font-bold " strokeWidth={2.25}/>
+      </Badge>
+      
       {/* Hero Headline */}
       <div className="text-center max-w-6xl mx-auto mb-12 space-y-6 relative z-20">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black tracking-tight">
@@ -26,7 +30,7 @@ const heroSection = () => {
           Upload PDFs,cdocs or notes and get instant, context-aware answers in
           seconds pusing Ai-powered sementic search.
         </p>
-      </div>
+      </div>  
 
       {/* Central Interactive Graphic */}
       <CenteralIntractiveGraphics />
@@ -62,7 +66,7 @@ const CenteralIntractiveGraphics = () => {
 
         {/* Glowing Center Core */}
         <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-400 to-orange-400 flex items-center justify-center shadow-lg shadow-rose-200/50 relative">
+          <div className="w-16 h-16 rounded-full bg-linear-to-br from-rose-400 to-orange-400 flex items-center justify-center shadow-lg shadow-rose-200/50 relative">
             <span className="text-2xl font-bold text-white">D</span>
             {/* Subtle outer glow */}
             <div className="absolute inset-0 bg-orange-400 blur-xl opacity-20 rounded-full"></div>
