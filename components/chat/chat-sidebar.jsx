@@ -58,8 +58,11 @@ import {
 } from "lucide-react";
 import { HeroGradient } from "../hero-gradient";
 import AiInput from "@/components/chat/ai-input";
+import { useRouter } from "next/navigation";
 
-export function ChatSidebar() {
+export function ChatSidebar({ children }) {
+  const router = useRouter();
+
   const data = {
     user: {
       name: "shadcn",
@@ -180,7 +183,10 @@ export function ChatSidebar() {
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader>
+        <SidebarHeader
+          className="border-b"
+          onClick={() => router.push("/chat")}
+        >
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -229,7 +235,6 @@ export function ChatSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
-        <SidebarSeparator />
 
         <SidebarContent>
           <SidebarGroup>
@@ -267,7 +272,7 @@ export function ChatSidebar() {
             </SidebarMenu>
           </SidebarGroup>
 
-          <div className="border-t mx-2" />
+          <div className="mx-2 border-t" />
 
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>History</SidebarGroupLabel>
@@ -411,19 +416,7 @@ export function ChatSidebar() {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col items-center gap-4 p-4">
-          <HeroGradient />
-          <div className="flex h-full w-full flex-col items-center justify-center">
-            <div className="relative z-10 mb-6 flex flex-col items-center justify-center">
-              <h2 className="mb-3 text-3xl font-bold">How can i assist you?</h2>
-              <p className="text-md text-neutral-600">
-                Quickly fins answers, get assistance, and explore AI-powered
-                insights-all in one place
-              </p>
-            </div>
-            <AiInput />
-          </div>
-        </div>
+        <main className="flex-1 overflow-hidden">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );
