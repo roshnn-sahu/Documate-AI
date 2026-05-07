@@ -42,6 +42,7 @@ import {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
+  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
@@ -228,6 +229,7 @@ export function ChatSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
+        <SidebarSeparator />
 
         <SidebarContent>
           <SidebarGroup>
@@ -264,6 +266,9 @@ export function ChatSidebar() {
               ))}
             </SidebarMenu>
           </SidebarGroup>
+
+          <div className="border-t mx-2" />
+
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>History</SidebarGroupLabel>
             <SidebarMenu>
@@ -280,6 +285,9 @@ export function ChatSidebar() {
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
+
+        <SidebarSeparator />
+
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -354,7 +362,10 @@ export function ChatSidebar() {
           <div className="flex items-center gap-2 px-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" className="h-8 w-8 rounded-full p-0">
+                <SidebarMenuButton
+                  size="lg"
+                  className="h-8 w-8 rounded-full p-0"
+                >
                   <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={data.user.avatar || "/placeholder.svg"}
@@ -365,38 +376,38 @@ export function ChatSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="mr-4">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>
-                  <Item size="xs">
-                    <ItemMedia>
-                      <Avatar>
-                        <AvatarImage
-                          src={data.user.avatar || "/placeholder.svg"}
-                          alt={data.user.name}
-                        />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                    </ItemMedia>
-                    <ItemContent>
-                      <ItemTitle>{data.user.name}</ItemTitle>
-                      <ItemDescription> {data.user.email}</ItemDescription>
-                    </ItemContent>
-                  </Item>
-                </DropdownMenuLabel>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Log out</DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenuContent className="mr-4">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>
+                    <Item size="xs">
+                      <ItemMedia>
+                        <Avatar>
+                          <AvatarImage
+                            src={data.user.avatar || "/placeholder.svg"}
+                            alt={data.user.name}
+                          />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+                      </ItemMedia>
+                      <ItemContent>
+                        <ItemTitle>{data.user.name}</ItemTitle>
+                        <ItemDescription> {data.user.email}</ItemDescription>
+                      </ItemContent>
+                    </Item>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Account</DropdownMenuItem>
+                  <DropdownMenuItem>Billing</DropdownMenuItem>
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
