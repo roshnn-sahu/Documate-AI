@@ -1,11 +1,9 @@
-
-
 const Footer = () => {
   return (
-    <footer className="py-12 border-t border-outline-variant/10">
-      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+    <footer className="border-outline-variant/10 border-t py-12">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-8 px-6 md:flex-row">
         <div className="flex items-center gap-2">
-          <div className="size-6 bg-primary/20 rounded flex items-center justify-center text-primary">
+          <div className="bg-primary/20 text-primary flex size-6 items-center justify-center rounded">
             <svg
               className="size-4"
               fill="none"
@@ -20,9 +18,9 @@ const Footer = () => {
               ></path>
             </svg>
           </div>
-          <span className="font-bold text-on-surface"> Documate AI</span>
+          <span className="text-on-surface font-bold"> Documate AI</span>
         </div>
-        <div className="flex gap-8 text-sm text-outline font-medium">
+        <div className="text-outline flex gap-8 text-sm font-medium">
           <a className="hover:text-primary transition-colors" href="#">
             Privacy Policy
           </a>
@@ -36,7 +34,9 @@ const Footer = () => {
             Twitter
           </a>
         </div>
-        <p className="text-xs text-outline/60">© 2024 Synapse Technologies Inc.</p>
+        <p className="text-outline/60 text-xs">
+          © 2024 Synapse Technologies Inc.
+        </p>
       </div>
     </footer>
   );
