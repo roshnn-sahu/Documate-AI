@@ -55,6 +55,8 @@ import {
   MapIcon,
   ChevronsUpDownIcon,
   ChevronRightIcon,
+  Pen,
+  SquarePen,
 } from "lucide-react";
 import { HeroGradient } from "../hero-gradient";
 import AiInput from "@/components/chat/ai-input";
@@ -236,9 +238,22 @@ export function ChatSidebar({ children }) {
           </SidebarMenu>
         </SidebarHeader>
 
+        <SidebarMenu className="mt-3 px-2" onClick={() => router.push("/chat")}>
+          <Collapsible asChild className="group/collapsible">
+            <SidebarMenuItem>
+              <SidebarMenuButton tooltip={"new-title"} asChild>
+                <CollapsibleTrigger>
+                  <SquarePen />
+                  <span>New chat</span>
+                </CollapsibleTrigger>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </Collapsible>
+        </SidebarMenu>
+
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupLabel>Tools</SidebarGroupLabel>
             <SidebarMenu>
               {data.navMain.map((item) => (
                 <Collapsible
@@ -360,7 +375,7 @@ export function ChatSidebar({ children }) {
       </Sidebar>
       {/* chat section */}
       <SidebarInset>
-        <header className="relative z-10 flex h-16 shrink-0 items-center justify-between border-b bg-white transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="relative z-10 flex h-16.5 shrink-0 items-center justify-between border-b bg-white transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
           </div>
@@ -416,7 +431,7 @@ export function ChatSidebar({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-hidden">{children}</main>
+        <main className="flex flex-1 overflow-hidden">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 export const title = "AI with Voice";
 
-const AiInput = ({ className="" }: { className: String }) => (
+const AiInput = ({ className = "" }: { className: String }) => (
   <div className={cn("flex w-full max-w-2xl flex-col gap-4", { className })}>
     <InputGroup className="bg-background">
       <InputGroupTextarea placeholder="Type or speak your message..." />
@@ -58,9 +58,14 @@ const AiInput = ({ className="" }: { className: String }) => (
       </InputGroupAddon>
     </InputGroup>
     <small className="text-muted-foreground relative z-10 text-center">
-      For better AI components, check out{" "}
-      <a className="underline" href="https://ai-sdk.dev/elements/overview">
-        AI Elements
+      AI generated answers are derived from your indexed documents{" "}
+      <a
+        className="underline"
+        href="https://docs.pinecone.io/docs/ai-generated-answers"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        verify critical information.
       </a>
     </small>
   </div>
