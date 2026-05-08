@@ -57,6 +57,10 @@ import {
   ChevronRightIcon,
   Pen,
   SquarePen,
+  Upload,
+  Files,
+  Waypoints,
+  Star,
 } from "lucide-react";
 import { HeroGradient } from "../hero-gradient";
 import AiInput from "@/components/chat/ai-input";
@@ -78,89 +82,30 @@ export function ChatSidebar({ children }) {
 
     navMain: [
       {
-        title: "Playground",
-        url: "#",
-        icon: <TerminalSquareIcon />,
+        title: "Uploads",
+        url: "/uploads",
+        icon: <Upload />,
         isActive: true,
-        items: [
-          {
-            title: "History",
-            url: "#",
-          },
-          {
-            title: "Starred",
-            url: "#",
-          },
-          {
-            title: "Settings",
-            url: "#",
-          },
-        ],
       },
       {
-        title: "Models",
-        url: "#",
+        title: "Documents",
+        url: "/documents",
+        icon: <Files />,
+      },
+      {
+        title: "AI Workspace",
+        url: "/workspace",
         icon: <BotIcon />,
-        items: [
-          {
-            title: "Genesis",
-            url: "#",
-          },
-          {
-            title: "Explorer",
-            url: "#",
-          },
-          {
-            title: "Quantum",
-            url: "#",
-          },
-        ],
       },
       {
-        title: "Documentation",
-        url: "#",
-        icon: <BookOpen />,
-        items: [
-          {
-            title: "Introduction",
-            url: "#",
-          },
-          {
-            title: "Get Started",
-            url: "#",
-          },
-          {
-            title: "Tutorials",
-            url: "#",
-          },
-          {
-            title: "Changelog",
-            url: "#",
-          },
-        ],
+        title: "Favourites",
+        url: "/favourites",
+        icon: <Star />,
       },
       {
-        title: "Settings",
-        url: "#",
-        icon: <Settings2Icon />,
-        items: [
-          {
-            title: "General",
-            url: "#",
-          },
-          {
-            title: "Team",
-            url: "#",
-          },
-          {
-            title: "Billing",
-            url: "#",
-          },
-          {
-            title: "Limits",
-            url: "#",
-          },
-        ],
+        title: "Shared",
+        url: "/shared",
+        icon: <Waypoints />,
       },
     ],
     projects: [
@@ -241,7 +186,11 @@ export function ChatSidebar({ children }) {
         <SidebarMenu className="mt-3 px-2" onClick={() => router.push("/chat")}>
           <Collapsible asChild className="group/collapsible">
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip={"new-title"} asChild>
+              <SidebarMenuButton
+                className="cursor-pointer"
+                tooltip={"new-title"}
+                asChild
+              >
                 <CollapsibleTrigger>
                   <SquarePen />
                   <span>New chat</span>
@@ -264,23 +213,14 @@ export function ChatSidebar({ children }) {
                 >
                   <SidebarMenuItem>
                     <SidebarMenuButton tooltip={item.title} asChild>
-                      <CollapsibleTrigger>
+                      <CollapsibleTrigger
+                        onClick={() => router.push(`${item.url}`)}
+                        className="cursor-pointer"
+                      >
                         {item.icon}
                         <span>{item.title}</span>
-                        <ChevronRightIcon className="ml-auto transition-transform duration-100 group-data-open/collapsible:rotate-90" />
                       </CollapsibleTrigger>
                     </SidebarMenuButton>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
-                              <a href={subItem.url}>{subItem.title}</a>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
               ))}
