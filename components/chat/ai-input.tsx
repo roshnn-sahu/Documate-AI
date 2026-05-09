@@ -17,16 +17,49 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { SpeechInput } from "../ui/speech-input";
+import { useRef, useState } from "react";
 
 export const title = "AI with Voice";
 
 const AiInput = ({ className = "" }: { className: String }) => {
   const router = useRouter();
 
-  const handleSubmit = () => {
-    const sessionId = uuid();
+  const [message, setMessage] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
-    router.push(`/chat/${sessionId}`);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      formData.append("message", message);
+
+      if (file) {
+        formData.append("file", file);
+      }
+
+      const response = await fetch("/api/chat/create", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
+
+      router.push(`/chat/${data.sessionId}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,27 +78,38 @@ const AiInput = ({ className = "" }: { className: String }) => {
               </InputGroupButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" side="top">
-              <DropdownMenuItem>
-                {" "}
-                <PaperclipIcon /> Attach File
+              <input
+                ref={fileInputRef}
+                type="file"
+                hidden
+                accept=".pdf,.docx,.xlsx,.txt,.csv"
+                onChange={(e) => {
+                  const selected = e.target.files?.[0];
+
+                  if (selected) {
+                    setFile(selected);
+                  }
+                }}
+              />
+              <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                <PaperclipIcon />
+                Attach File
               </DropdownMenuItem>
-              <DropdownMenuItem>Claude 3 Opus</DropdownMenuItem>
-              <DropdownMenuItem>Claude 3 Haiku</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <InputGroupButton size="icon-xs" variant="ghost" className="ml-auto">
-            <MicIcon />
+            <SpeechInput mode="speech-recognition" className="p-0" />
           </InputGroupButton>
 
           <Separator className="!h-4" orientation="vertical" />
           <InputGroupButton
             className="rounded-full"
-            size="icon-xs"
+            size="icon-sm"
             variant="default"
             onClick={handleSubmit}
           >
-            <ArrowUpIcon />
+            <ArrowUpIcon className="size-4" />
             <span className="sr-only">Send</span>
           </InputGroupButton>
         </InputGroupAddon>

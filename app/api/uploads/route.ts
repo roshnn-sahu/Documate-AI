@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
-import pdfParse from "pdf-parse";
+import {pdfParse} from "pdf-parse";
 import { v4 as uuid } from "uuid";
 
 export async function POST(req: Request) {
