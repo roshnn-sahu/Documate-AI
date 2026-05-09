@@ -246,7 +246,7 @@ export function ChatSidebar({ children }) {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarSeparator />
+  <div className="mx-2 border-t" />
 
         <SidebarFooter>
           <SidebarMenu>
@@ -371,7 +371,7 @@ export function ChatSidebar({ children }) {
           </div>
         </header>
 
-        <main className="flex flex-1 overflow-hidden">{children}</main>
+        <main className="flex flex-1 overflow-hidden p-2">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -1,9 +1,12 @@
-import React from 'react'
+import UploadDropzone from "@/components/uploads/upload-dropzone";
+import React from "react";
 
 const page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <>
+      <UploadDropzone />
+    </>
+  );
+};
 
-export default page
+export default page;

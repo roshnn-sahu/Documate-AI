@@ -1,3 +1,6 @@
+"use client";
+import { v4 as uuid } from "uuid";
+import { useRouter } from "next/navigation";
 import { ArrowUpIcon, File, MicIcon, PaperclipIcon, Plus } from "lucide-react";
 
 import {
@@ -17,58 +20,69 @@ import { cn } from "@/lib/utils";
 
 export const title = "AI with Voice";
 
-const AiInput = ({ className = "" }: { className: String }) => (
-  <div className={cn("flex w-full max-w-2xl flex-col gap-4", { className })}>
-    <InputGroup className="bg-background">
-      <InputGroupTextarea placeholder="Type or speak your message..." />
+const AiInput = ({ className = "" }: { className: String }) => {
+  const router = useRouter();
 
-      <InputGroupAddon align="block-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <InputGroupButton
-              className="text-md rounded-full border"
-              variant="ghost"
-            >
-              <Plus />
-            </InputGroupButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" side="top">
-            <DropdownMenuItem>
-              {" "}
-              <PaperclipIcon /> Attach File
-            </DropdownMenuItem>
-            <DropdownMenuItem>Claude 3 Opus</DropdownMenuItem>
-            <DropdownMenuItem>Claude 3 Haiku</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+  const handleSubmit = () => {
+    const sessionId = uuid();
 
-        <InputGroupButton size="icon-xs" variant="ghost" className="ml-auto">
-          <MicIcon />
-        </InputGroupButton>
+    router.push(`/chat/${sessionId}`);
+  };
 
-        <Separator className="!h-4" orientation="vertical" />
-        <InputGroupButton
-          className="rounded-full"
-          size="icon-xs"
-          variant="default"
+  return (
+    <div className={cn("flex w-full max-w-2xl flex-col gap-4", { className })}>
+      <InputGroup className="bg-background">
+        <InputGroupTextarea placeholder="Type or speak your message..." />
+
+        <InputGroupAddon align="block-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <InputGroupButton
+                className="text-md rounded-full border"
+                variant="ghost"
+              >
+                <Plus />
+              </InputGroupButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" side="top">
+              <DropdownMenuItem>
+                {" "}
+                <PaperclipIcon /> Attach File
+              </DropdownMenuItem>
+              <DropdownMenuItem>Claude 3 Opus</DropdownMenuItem>
+              <DropdownMenuItem>Claude 3 Haiku</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <InputGroupButton size="icon-xs" variant="ghost" className="ml-auto">
+            <MicIcon />
+          </InputGroupButton>
+
+          <Separator className="!h-4" orientation="vertical" />
+          <InputGroupButton
+            className="rounded-full"
+            size="icon-xs"
+            variant="default"
+            onClick={handleSubmit}
+          >
+            <ArrowUpIcon />
+            <span className="sr-only">Send</span>
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+      <small className="text-muted-foreground relative z-10 text-center">
+        AI generated answers are derived from your indexed documents{" "}
+        <a
+          className="underline"
+          href="https://docs.pinecone.io/docs/ai-generated-answers"
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          <ArrowUpIcon />
-          <span className="sr-only">Send</span>
-        </InputGroupButton>
-      </InputGroupAddon>
-    </InputGroup>
-    <small className="text-muted-foreground relative z-10 text-center">
-      AI generated answers are derived from your indexed documents{" "}
-      <a
-        className="underline"
-        href="https://docs.pinecone.io/docs/ai-generated-answers"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        verify critical information.
-      </a>
-    </small>
-  </div>
-);
+          verify critical information.
+        </a>
+      </small>
+    </div>
+  );
+};
 
 export default AiInput;
