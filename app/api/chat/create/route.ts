@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { createSession } from "@/lib/chat/create-session";
-
 import { validateFile } from "@/lib/uploads/validate-file";
-
 import { saveFile } from "@/lib/uploads/save-file";
-
 import { parseDocument } from "@/lib/loader/index";
-
 import { ingestDocument } from "@/lib/rag/ingestion";
+import { sessionVectorStores } from "@/lib/rag/store";
 
 export async function POST(req: Request) {
   try {
@@ -35,10 +32,12 @@ export async function POST(req: Request) {
       const saved = await saveFile(file, buffer);
 
       // parse
-      const parsed = await parseDocument(saved.filePath, file.type);
+      const parsed = await parseDocument(saved.filepath, file.type);
 
       // ingest into RAG
       const ingestion = await ingestDocument(parsed.text);
+      
+      sessionVectorStores.set(session.id, ingestion.vectorStore);
 
       document = {
         name: file.name,
