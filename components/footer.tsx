@@ -14,7 +14,7 @@ const Footer = () => {
                 clipRule="evenodd"
                 d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
                 fill="currentColor"
-                fill-rule="evenodd"
+                fillRule="evenodd"
               ></path>
             </svg>
           </div>

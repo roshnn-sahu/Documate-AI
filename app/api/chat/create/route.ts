@@ -3,8 +3,12 @@ import { NextResponse } from "next/server";
 import { createSession } from "@/lib/chat/create-session";
 
 import { validateFile } from "@/lib/uploads/validate-file";
+
 import { saveFile } from "@/lib/uploads/save-file";
-import { parseDocument } from "@/lib/loaders";
+
+import { parseDocument } from "@/lib/loader/index";
+
+import { ingestDocument } from "@/lib/rag/ingestion";
 
 export async function POST(req: Request) {
   try {
@@ -28,21 +32,22 @@ export async function POST(req: Request) {
       const buffer = Buffer.from(bytes);
 
       // save
-      const saved = await saveFile(
-        file,
-        buffer
-      );
+      const saved = await saveFile(file, buffer);
 
       // parse
-      const parsed = await parseDocument(
-        saved.filePath,
-        file.type
-      );
+      const parsed = await parseDocument(saved.filePath, file.type);
+
+      // ingest into RAG
+      const ingestion = await ingestDocument(parsed.text);
 
       document = {
         name: file.name,
+
         type: file.type,
+
         textLength: parsed.text.length,
+
+        chunks: ingestion.chunks.length,
       };
     }
 
@@ -58,12 +63,11 @@ export async function POST(req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       {
-        error:
-          error.message || "Failed to create chat",
+        error: error.message || "Failed to create chat",
       },
       {
         status: 500,
-      }
+      },
     );
   }
 }

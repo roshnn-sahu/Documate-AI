@@ -3,10 +3,7 @@ import { parseDocx } from "./docx-loader";
 import { parseExcel } from "./excel-loader";
 import { parseText } from "./text-loader";
 
-export async function parseDocument(
-  filepath: string,
-  mimeType: string
-) {
+export async function parseDocument(filepath: string, mimeType: string) {
   switch (mimeType) {
     case "application/pdf":
       return parsePdf(filepath);
@@ -21,8 +18,6 @@ export async function parseDocument(
       return parseText(filepath);
 
     default:
-      throw new Error(
-        "Unsupported document type"
-      );
+      throw new Error("Unsupported document type");
   }
 }
