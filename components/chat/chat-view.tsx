@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { v4 as uuid } from "uuid";
+
+import { ChatMessage } from "@/types/chat";
 
 import {
   Conversation,
@@ -17,33 +21,40 @@ interface Props {
   sessionId: string;
 }
 
-interface ChatMessage {
-  role: "user" | "assistant";
-
-  content: string;
-}
-
 export default function ChatView({ sessionId }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const [loading, setLoading] = useState(false);
 
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // auto scroll
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   const sendMessage = async (message: string) => {
-    if (!message.trim()) return;
+    if (!message.trim() || loading) return;
+
+    const userMessageId = uuid();
+
+    const assistantMessageId = uuid();
 
     try {
       setLoading(true);
 
-      // add user + assistant placeholder
+      // add user + empty assistant
       setMessages((prev) => [
         ...prev,
-
         {
+          id: userMessageId,
           role: "user",
           content: message,
         },
-
         {
+          id: assistantMessageId,
           role: "assistant",
           content: "",
         },
@@ -61,39 +72,59 @@ export default function ChatView({ sessionId }: Props) {
         }),
       });
 
-      if (!response.body) return;
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      const sourcesHeader = response.headers.get("x-sources");
+      const sources = sourcesHeader
+        ? JSON.parse(decodeURIComponent(sourcesHeader))
+        : [];
+
+      if (!response.body) {
+        throw new Error("No response stream found");
+      }
 
       const reader = response.body.getReader();
-
       const decoder = new TextDecoder();
-
-      let done = false;
-
       let accumulated = "";
 
-      while (!done) {
-        const result = await reader.read();
-
-        done = result.done;
-
-        const chunk = decoder.decode(result.value);
-
-        accumulated += chunk;
-
-        setMessages((prev) => {
-          const updated = [...prev];
-
-          updated[updated.length - 1] = {
-            role: "assistant",
-
-            content: accumulated,
-          };
-
-          return updated;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, {
+          stream: true,
         });
+
+        if (!chunk) continue;
+        accumulated += chunk;
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? {
+                  ...msg,
+
+                  content: accumulated,
+                  sources,
+                }
+              : msg,
+          ),
+        );
       }
     } catch (error) {
-      console.error(error);
+      console.error("Streaming error:", error);
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessageId
+            ? {
+                ...msg,
+
+                content: "Something went wrong while generating response.",
+              }
+            : msg,
+        ),
+      );
     } finally {
       setLoading(false);
     }
@@ -109,20 +140,30 @@ export default function ChatView({ sessionId }: Props) {
               description="Ask questions about your uploaded documents"
             />
           ) : (
-            messages.map((message, index) => (
-              <Message
-                key={index}
-                role={message.role}
-                content={message.content}
-              />
-            ))
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <Message
+                  key={message.id}
+                  role={message.role}
+                  content={message.content}
+                />
+              ))}
+
+              {loading && (
+                <div className="px-2 text-sm text-neutral-500">
+                  AI is thinking...
+                </div>
+              )}
+
+              <div ref={bottomRef} />
+            </div>
           )}
         </ConversationContent>
 
         <ConversationScrollButton />
       </Conversation>
 
-      <div className="border-t p-4">
+      <div className="border-t bg-white p-4">
         <AiInput isLoading={loading} onSend={sendMessage} />
       </div>
     </div>

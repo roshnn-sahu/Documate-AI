@@ -23,6 +23,9 @@ import {
   AttachmentPreview,
   AttachmentInfo,
   AttachmentRemove,
+  AttachmentHoverCard,
+  AttachmentHoverCardTrigger,
+  AttachmentHoverCardContent,
 } from "./attachments";
 
 import { Separator } from "@/components/ui/separator";
@@ -49,21 +52,17 @@ const AiInput = ({
 
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (files.length > 0) {
-      const url = URL.createObjectURL(files[0]);
-      setPreviewUrl(url);
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    } else {
-      setPreviewUrl("");
-    }
+    const urls = files.map((file) => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+    return () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
   }, [files]);
 
   const attachments = useMemo(
@@ -73,9 +72,9 @@ const AiInput = ({
         type: "file" as const,
         filename: f.name,
         mediaType: f.type,
-        url: i === 0 ? previewUrl : URL.createObjectURL(f),
+        url: previewUrls[i],
       })),
-    [files, previewUrl],
+    [files, previewUrls],
   );
 
   const handleSubmit = async () => {
@@ -92,9 +91,9 @@ const AiInput = ({
 
       const formData = new FormData();
       formData.append("message", message);
-      if (files.length > 0) {
-        formData.append("file", files[0]);
-      }
+      files.forEach((file) => {
+        formData.append("file", file);
+      });
 
       const response = await fetch("/api/chat/create", {
         method: "POST",
@@ -121,12 +120,13 @@ const AiInput = ({
         ref={fileInputRef}
         type="file"
         hidden
-        accept=".pdf,.docx,.xlsx,.txt,.csv"
+        multiple
+        accept=".pdf,.docx,.xlsx,.txt,.csv,.png,.jpeg,.webp,.mp3,.wav,.mp4,.avi,.mov,.wmv"
         onChange={(e) => {
-          const selected = e.target.files?.[0];
+          const selectedFiles = Array.from(e.target.files || []);
 
-          if (selected) {
-            setFiles([selected]);
+          if (selectedFiles.length > 0) {
+            setFiles((prev) => [...prev, ...selectedFiles]);
             e.target.value = "";
           }
         }}
@@ -134,20 +134,35 @@ const AiInput = ({
       <InputGroup className="bg-background has-[[data-slot=attachments]]:flex-col has-[[data-slot=attachments]]:items-start">
         {attachments.length > 0 && (
           <Attachments
-            variant="list"
+            variant="inline"
             data-slot="attachments"
             className="w-full border-b p-3"
           >
-            {attachments.map((attachment) => (
-              <Attachment
-                key={attachment.id}
-                data={attachment}
-                onRemove={() => setFiles([])}
-              >
-                <AttachmentPreview />
-                <AttachmentInfo showMediaType />
-                <AttachmentRemove />
-              </Attachment>
+            {attachments.map((attachment, index) => (
+              <AttachmentHoverCard key={attachment.id}>
+                <AttachmentHoverCardTrigger asChild>
+                  <Attachment
+                    data={attachment}
+                    onRemove={() =>
+                      setFiles((prev) => prev.filter((_, i) => i !== index))
+                    }
+                  >
+                    <AttachmentPreview />
+
+                    <AttachmentRemove />
+                  </Attachment>
+                </AttachmentHoverCardTrigger>
+                <AttachmentHoverCardContent className="w-48">
+                  <div className="flex flex-col gap-1 overflow-hidden">
+                    <p className="text-sm font-medium break-all">
+                      {attachment.filename}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {attachment.mediaType}
+                    </p>
+                  </div>
+                </AttachmentHoverCardContent>
+              </AttachmentHoverCard>
             ))}
           </Attachments>
         )}

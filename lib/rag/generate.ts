@@ -7,7 +7,7 @@ export async function generateAnswer(docs: any[], question: string) {
 
   const prompt = buildPrompt(context, question);
 
-  const response = await model.invoke(prompt);
+  const response = await model.stream(prompt);
 
-  return response.content;
+  return response;
 }

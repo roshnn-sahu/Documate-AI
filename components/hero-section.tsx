@@ -15,31 +15,31 @@ import { Badge } from "./ui/badge";
 
 const heroSection = () => {
   return (
-    <main className="relative z-10 flex flex-col items-center pt-[180px] pb-32  rounded-2xl mx-auto  overflow-hidden">
+    <main className="relative z-10 mx-auto flex flex-col items-center overflow-hidden rounded-2xl pt-[180px] pb-32">
       <HeroGradient />
       <Badge className="bg-linear-to-br from-rose-400 to-orange-400">
-        AI Chatbot <Bot className="font-bold " strokeWidth={2.25}/>
+        AI Chatbot <Bot className="font-bold" strokeWidth={2.25} />
       </Badge>
-      
+
       {/* Hero Headline */}
-      <div className="text-center max-w-6xl mx-auto mb-12 space-y-6 relative z-20">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-black tracking-tight">
+      <div className="relative z-20 mx-auto mb-12 max-w-6xl space-y-6 text-center">
+        <h1 className="bg-linear-to-b from-neutral-900 to-neutral-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent md:text-6xl lg:text-7xl">
           Chat with your document <br className="hidden md:block" /> using AI
         </h1>
-        <p className="text-[#64748b] text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+        <p className="mx-auto max-w-2xl text-base leading-relaxed font-medium text-[#64748b] md:text-xl">
           Upload PDFs,cdocs or notes and get instant, context-aware answers in
           seconds pusing Ai-powered sementic search.
         </p>
-      </div>  
+      </div>
 
       {/* Central Interactive Graphic */}
       <CenteralIntractiveGraphics />
       {/* Call To Action */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4  mt-16 relative z-30">
-        <button className="w-full sm:w-auto bg-[#1e293b] hover:bg-slate-800 text-white px-8 py-3.5 rounded-full font-semibold transition-all duration-200 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-slate-300 text-sm tracking-wide">
+      <div className="relative z-30 mt-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <button className="w-full rounded-full bg-[#1e293b] px-8 py-3.5 text-sm font-semibold tracking-wide text-white shadow-xl shadow-slate-200/50 transition-all duration-200 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-300 sm:w-auto">
           Try for free
         </button>
-        <button className="w-full sm:w-auto bg-white hover:bg-gray-50 text-[#1e293b] border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all duration-200 shadow-sm hover:shadow-md text-sm tracking-wide">
+        <button className="w-full rounded-full border border-gray-200 bg-white px-8 py-3.5 text-sm font-semibold tracking-wide text-[#1e293b] shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md sm:w-auto">
           Request a Demo
         </button>
       </div>
@@ -51,54 +51,54 @@ export default heroSection;
 
 const CenteralIntractiveGraphics = () => {
   return (
-    <div className="relative w-full max-w-4xl mx-auto h-auto min-h-[460px] flex items-center justify-center mt-6">
+    <div className="relative mx-auto mt-6 flex h-auto min-h-[460px] w-full max-w-4xl items-center justify-center">
       {/* Main Chat Interface Window */}
-      <div className="flex flex-col w-full max-w-[380px] bg-white rounded-[32px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] p-6 z-50 relative border border-white">
+      <div className="relative z-50 flex w-full max-w-[380px] flex-col rounded-[32px] border border-white bg-white p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <X
-            className="w-5 h-5 text-gray-300 cursor-pointer hover:text-gray-500 transition-colors"
+            className="h-5 w-5 cursor-pointer text-gray-300 transition-colors hover:text-gray-500"
             strokeWidth={2.5}
           />
-          <span className="font-semibold text-gray-700 text-sm">New chat</span>
-          <Sparkles className="w-5 h-5 text-rose-400" strokeWidth={2.5} />
+          <span className="text-sm font-semibold text-gray-700">New chat</span>
+          <Sparkles className="h-5 w-5 text-rose-400" strokeWidth={2.5} />
         </div>
 
         {/* Glowing Center Core */}
-        <div className="flex justify-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-linear-to-br from-rose-400 to-orange-400 flex items-center justify-center shadow-lg shadow-rose-200/50 relative">
+        <div className="mb-8 flex justify-center">
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-rose-400 to-orange-400 shadow-lg shadow-rose-200/50">
             <span className="text-2xl font-bold text-white">D</span>
             {/* Subtle outer glow */}
-            <div className="absolute inset-0 bg-orange-400 blur-xl opacity-20 rounded-full"></div>
+            <div className="absolute inset-0 rounded-full bg-orange-400 opacity-20 blur-xl"></div>
           </div>
         </div>
 
         {/* Chat Thread */}
-        <div className="space-y-4 mb-20 text-[13px]">
-          <div className="bg-[#f8fafc] rounded-[20px] rounded-tl-sm p-4 text-gray-600 leading-relaxed max-w-[90%] shadow-sm border border-gray-100">
+        <div className="mb-20 space-y-4 text-[13px]">
+          <div className="max-w-[90%] rounded-[20px] rounded-tl-sm border border-gray-100 bg-[#f8fafc] p-4 leading-relaxed text-gray-600 shadow-sm">
             Provide a detailed summary of my company's latest investment
             including key metrics.
           </div>
-          <div className="bg-white rounded-[20px] rounded-tr-sm p-4 text-gray-600 leading-relaxed max-w-[85%] self-end ml-auto shadow-sm border border-gray-100 transition-all hover:shadow-md">
+          <div className="ml-auto max-w-[85%] self-end rounded-[20px] rounded-tr-sm border border-gray-100 bg-white p-4 leading-relaxed text-gray-600 shadow-sm transition-all hover:shadow-md">
             What are the key performance trends for my company this quarter?
           </div>
         </div>
 
         {/* Chat Input Field */}
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="rounded-full p-[2px] bg-gradient-to-r from-rose-400 via-orange-300 to-yellow-300 shadow-sm transition-transform hover:scale-[1.02]">
-            <div className="bg-white rounded-full flex items-center px-3 py-[9px]">
-              <div className="w-7 h-7 rounded-full bg-rose-400 flex items-center justify-center mr-3 shrink-0 shadow-inner">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
+        <div className="absolute right-6 bottom-6 left-6">
+          <div className="rounded-full bg-gradient-to-r from-rose-400 via-orange-300 to-yellow-300 p-[2px] shadow-sm transition-transform hover:scale-[1.02]">
+            <div className="flex items-center rounded-full bg-white px-3 py-[9px]">
+              <div className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-400 shadow-inner">
+                <Sparkles className="h-3.5 w-3.5 text-white" />
               </div>
               <input
                 type="text"
                 placeholder="Ask or search for anything"
-                className="flex-1 outline-none text-[13px] text-gray-700 bg-transparent placeholder-gray-400 font-medium whitespace-nowrap cursor-pointer"
+                className="flex-1 cursor-pointer bg-transparent text-[13px] font-medium whitespace-nowrap text-gray-700 placeholder-gray-400 outline-none"
                 readOnly
               />
-              <div className="text-gray-400 border border-gray-200 rounded-full p-1 ml-2 shrink-0 hover:bg-gray-50 transition-colors">
-                <ChevronDown className="w-4 h-4" />
+              <div className="ml-2 shrink-0 rounded-full border border-gray-200 p-1 text-gray-400 transition-colors hover:bg-gray-50">
+                <ChevronDown className="h-4 w-4" />
               </div>
             </div>
           </div>
@@ -108,52 +108,52 @@ const CenteralIntractiveGraphics = () => {
       {/* --- Flanking Data Cards --- */}
 
       {/* Left Column Data Components */}
-      <div className="hidden lg:block absolute top-[2%] left-[2%] xl:left-[8%] z-10 w-[240px]">
+      <div className="absolute top-[2%] left-[2%] z-10 hidden w-[240px] lg:block xl:left-[8%]">
         {/* Stat Pill 1 */}
-        <div className="absolute top-8 left-4 w-[230px] bg-white rounded-[20px] p-3 shadow-xl flex items-center gap-3 z-20 border border-gray-50 transform -rotate-[3deg] hover:rotate-0 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-          <div className="p-2.5 bg-orange-50 rounded-full shrink-0 group-hover:bg-orange-100 transition-colors">
-            <PieChart className="w-5 h-5 text-orange-400" strokeWidth={2.5} />
+        <div className="group absolute top-8 left-4 z-20 flex w-[230px] -rotate-[3deg] transform cursor-default items-center gap-3 rounded-[20px] border border-gray-50 bg-white p-3 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:rotate-0">
+          <div className="shrink-0 rounded-full bg-orange-50 p-2.5 transition-colors group-hover:bg-orange-100">
+            <PieChart className="h-5 w-5 text-orange-400" strokeWidth={2.5} />
           </div>
           <div className="flex-1">
-            <div className="font-[800] text-gray-800 text-lg leading-tight">
+            <div className="text-lg leading-tight font-[800] text-gray-800">
               48%
             </div>
-            <div className="text-[10px] text-gray-500 font-medium leading-tight mt-0.5">
+            <div className="mt-0.5 text-[10px] leading-tight font-medium text-gray-500">
               The Best Deals for this year!
             </div>
           </div>
-          <MoreVertical className="w-4 h-4 text-gray-300 absolute top-2.5 right-1.5" />
+          <MoreVertical className="absolute top-2.5 right-1.5 h-4 w-4 text-gray-300" />
         </div>
 
         {/* Stat Pill 2 */}
-        <div className="absolute top-[80px] left-8 w-[230px] bg-white rounded-[20px] p-3 shadow-lg flex items-center gap-3 z-10 border border-gray-50 transform rotate-2 hover:rotate-0 hover:-translate-y-1 transition-all duration-300 cursor-default group">
-          <div className="p-2.5 bg-purple-50 rounded-full shrink-0 group-hover:bg-purple-100 transition-colors">
-            <Home className="w-5 h-5 text-purple-500" strokeWidth={2.5} />
+        <div className="group absolute top-[80px] left-8 z-10 flex w-[230px] rotate-2 transform cursor-default items-center gap-3 rounded-[20px] border border-gray-50 bg-white p-3 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:rotate-0">
+          <div className="shrink-0 rounded-full bg-purple-50 p-2.5 transition-colors group-hover:bg-purple-100">
+            <Home className="h-5 w-5 text-purple-500" strokeWidth={2.5} />
           </div>
           <div className="flex-1">
-            <div className="font-[800] text-gray-800 text-lg leading-tight">
+            <div className="text-lg leading-tight font-[800] text-gray-800">
               68%
             </div>
-            <div className="text-[10px] text-gray-500 font-medium leading-tight mt-0.5">
+            <div className="mt-0.5 text-[10px] leading-tight font-medium text-gray-500">
               in this year's art race
             </div>
           </div>
-          <MoreVertical className="w-4 h-4 text-gray-300 absolute top-2.5 right-1.5" />
+          <MoreVertical className="absolute top-2.5 right-1.5 h-4 w-4 text-gray-300" />
         </div>
       </div>
 
       {/* Bottom Left Sales Card */}
-      <div className="hidden lg:block absolute bottom-[-4%] left-[6%] xl:left-[12%] z-30 w-[190px] bg-white p-5 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transform -rotate-[4deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-300 border border-gray-50">
-        <div className="w-12 h-12 rounded-2xl bg-[#6366f1] text-white flex items-center justify-center mb-5 shadow-lg shadow-indigo-200/50">
-          <BarChart3 className="w-6 h-6" strokeWidth={2.5} />
+      <div className="absolute bottom-[-4%] left-[6%] z-30 hidden w-[190px] -rotate-[4deg] transform rounded-3xl border border-gray-50 bg-white p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-2 hover:rotate-0 lg:block xl:left-[12%]">
+        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#6366f1] text-white shadow-lg shadow-indigo-200/50">
+          <BarChart3 className="h-6 w-6" strokeWidth={2.5} />
         </div>
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="font-extrabold text-gray-800 text-sm">Sales</span>
-          <span className="text-emerald-600 text-[10px] font-bold flex items-center bg-emerald-50 px-1 py-0.5 rounded tracking-wide">
-            +5.9% <ArrowUpRight className="w-3 h-3 ml-[1px]" />
+        <div className="mb-1.5 flex items-center gap-2">
+          <span className="text-sm font-extrabold text-gray-800">Sales</span>
+          <span className="flex items-center rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-bold tracking-wide text-emerald-600">
+            +5.9% <ArrowUpRight className="ml-[1px] h-3 w-3" />
           </span>
         </div>
-        <div className="text-[22px] font-[800] text-gray-900 mb-1">
+        <div className="mb-1 text-[22px] font-[800] text-gray-900">
           $7,854.21
         </div>
         <div className="text-[10px] font-medium text-gray-400">
@@ -164,49 +164,49 @@ const CenteralIntractiveGraphics = () => {
       {/* Right Column Data Components */}
 
       {/* Top Right Chart Card */}
-      <div className="hidden lg:block absolute top-[5%] right-[2%] xl:right-[8%] z-10 w-[200px] bg-white p-5 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transform rotate-[5deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-300 border border-gray-50">
-        <div className="flex items-center justify-between mb-4">
-          <span className="font-bold text-gray-700 text-xs">Sales Figures</span>
+      <div className="absolute top-[5%] right-[2%] z-10 hidden w-[200px] rotate-[5deg] transform rounded-3xl border border-gray-50 bg-white p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-2 hover:rotate-0 lg:block xl:right-[8%]">
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-xs font-bold text-gray-700">Sales Figures</span>
           <div className="flex gap-0.5">
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
+            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
+            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
           </div>
         </div>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-3 h-3 rounded-md bg-orange-400 shadow-sm shadow-orange-200"></div>
-          <div className="font-[800] text-xl text-gray-900 tracking-tight">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="h-3 w-3 rounded-md bg-orange-400 shadow-sm shadow-orange-200"></div>
+          <div className="text-xl font-[800] tracking-tight text-gray-900">
             $4,686.82
           </div>
         </div>
-        <div className="text-[10px] font-medium text-gray-400 mb-3">
+        <div className="mb-3 text-[10px] font-medium text-gray-400">
           Upcoming Sales
         </div>
-        <div className="flex items-end gap-[6px] h-12">
-          <div className="w-full h-[40%] rounded bg-orange-100 hover:bg-orange-200 transition-colors"></div>
-          <div className="w-full h-[60%] rounded bg-gray-100 hover:bg-gray-200 transition-colors"></div>
-          <div className="w-full h-[30%] rounded bg-gray-100 hover:bg-gray-200 transition-colors"></div>
-          <div className="w-full h-[100%] rounded bg-orange-400 shadow-sm hover:bg-orange-500 transition-colors"></div>
-          <div className="w-full h-[70%] rounded bg-gray-100 hover:bg-gray-200 transition-colors"></div>
+        <div className="flex h-12 items-end gap-[6px]">
+          <div className="h-[40%] w-full rounded bg-orange-100 transition-colors hover:bg-orange-200"></div>
+          <div className="h-[60%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
+          <div className="h-[30%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
+          <div className="h-[100%] w-full rounded bg-orange-400 shadow-sm transition-colors hover:bg-orange-500"></div>
+          <div className="h-[70%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
         </div>
       </div>
 
       {/* Bottom Right Performance Card */}
-      <div className="hidden lg:block absolute bottom-[-1%] right-[0%] xl:right-[6%] z-30 w-[220px] bg-white p-5 rounded-3xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transform rotate-[2deg] hover:rotate-0 hover:-translate-y-2 transition-all duration-300 border border-gray-50">
-        <div className="flex items-center justify-between mb-3">
-          <span className="font-bold text-gray-700 text-[11px]">
+      <div className="absolute right-[0%] bottom-[-1%] z-30 hidden w-[220px] rotate-[2deg] transform rounded-3xl border border-gray-50 bg-white p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-2 hover:rotate-0 lg:block xl:right-[6%]">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-[11px] font-bold text-gray-700">
             Average Total Sales
           </span>
           <div className="flex gap-[3px]">
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
+            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
+            <div className="h-1 w-1 rounded-full bg-gray-300"></div>
           </div>
         </div>
 
         {/* Radial Progress Display */}
-        <div className="flex justify-center mb-5 relative">
-          <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+        <div className="relative mb-5 flex justify-center">
+          <svg className="h-24 w-24 -rotate-90 transform" viewBox="0 0 100 100">
             <circle
               cx="50"
               cy="50"
@@ -228,11 +228,11 @@ const CenteralIntractiveGraphics = () => {
               className="drop-shadow-sm transition-all duration-1000 ease-out"
             />
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center mt-0.5">
-            <span className="text-xl font-[800] text-gray-900 tracking-tight">
+          <div className="absolute inset-0 mt-0.5 flex flex-col items-center justify-center">
+            <span className="text-xl font-[800] tracking-tight text-gray-900">
               88%
             </span>
-            <span className="text-[7px] font-bold text-purple-500 uppercase tracking-tight text-center w-12 leading-[1.2] mt-0.5">
+            <span className="mt-0.5 w-12 text-center text-[7px] leading-[1.2] font-bold tracking-tight text-purple-500 uppercase">
               Target Reached SV
             </span>
           </div>
@@ -241,14 +241,14 @@ const CenteralIntractiveGraphics = () => {
         {/* Metric Breakdown */}
         <div className="flex justify-between border-t border-gray-100 pt-3">
           <div className="flex flex-col">
-            <span className="text-[9px] font-semibold text-gray-400 mb-0.5">
+            <span className="mb-0.5 text-[9px] font-semibold text-gray-400">
               Average Sales
             </span>
             <span className="text-xs font-[800] text-gray-800">$4,277.86</span>
           </div>
           <div className="w-px bg-gray-100"></div>
           <div className="flex flex-col text-right">
-            <span className="text-[9px] font-semibold text-gray-400 mb-0.5">
+            <span className="mb-0.5 text-[9px] font-semibold text-gray-400">
               Average Products
             </span>
             <span className="text-xs font-[800] text-gray-800">$2,572.75</span>

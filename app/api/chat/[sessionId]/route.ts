@@ -30,6 +30,10 @@ export async function POST(req: Request, { params }: Props) {
 
     // retrieve relevant chunks
     const docs = await retrieveContext(vectorStore, message);
+    const sources = docs.map((doc: any) => ({
+      content: doc.pageContent,
+      metadata: doc.metadata,
+    }));
 
     const stream = await streamAnswer(docs, message);
 
@@ -59,8 +63,8 @@ export async function POST(req: Request, { params }: Props) {
     return new Response(readableStream, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-
         "Transfer-Encoding": "chunked",
+        "x-sources": encodeURIComponent(JSON.stringify(sources)),
       },
     });
   } catch (error: any) {

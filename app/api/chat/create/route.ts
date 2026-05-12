@@ -30,33 +30,29 @@ export async function POST(req: Request) {
 
       // save
       const saved = await saveFile(file, buffer);
-
       // parse
       const parsed = await parseDocument(saved.filepath, file.type);
-
       // ingest into RAG
-      const ingestion = await ingestDocument(parsed.text);
-      
+      const ingestion = await ingestDocument({
+        text: parsed.text,
+        fileName: file.name,
+        filePath: saved.filepath,
+      });
+
       sessionVectorStores.set(session.id, ingestion.vectorStore);
 
       document = {
         name: file.name,
-
         type: file.type,
-
         textLength: parsed.text.length,
-
         chunks: ingestion.chunks.length,
       };
     }
 
     return NextResponse.json({
       success: true,
-
       sessionId: session.id,
-
       message,
-
       document,
     });
   } catch (error: any) {

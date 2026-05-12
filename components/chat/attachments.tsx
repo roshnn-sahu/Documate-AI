@@ -292,7 +292,18 @@ export const AttachmentInfo = ({
   const label = getAttachmentLabel(data);
 
   if (variant === "grid") {
-    return null;
+    return (
+      <div
+        className={cn(
+          "absolute inset-x-0 bottom-0 bg-black/60 px-1 py-0.5",
+          "text-[10px] text-white backdrop-blur-sm transition-opacity group-hover:opacity-100",
+          className
+        )}
+        {...props}
+      >
+        <span className="block truncate">{label}</span>
+      </div>
+    );
   }
 
   return (
