@@ -1,9 +1,7 @@
 import fs from "fs/promises";
 import mammoth from "mammoth";
 
-export async function parseDocx(filepath: string) {
-  const buffer = await fs.readFile(filepath);
-
+export async function parseDocx(buffer: Buffer) {
   const result = await mammoth.extractRawText({
     buffer,
   });

@@ -3,19 +3,19 @@ import { parseDocx } from "./docx-loader";
 import { parseExcel } from "./excel-loader";
 import { parseText } from "./text-loader";
 
-export async function parseDocument(filepath: string, mimeType: string) {
+export async function parseDocument(buffer: Buffer, mimeType: string) {
   switch (mimeType) {
     case "application/pdf":
-      return parsePdf(filepath);
+      return parsePdf(buffer);
 
     case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-      return parseDocx(filepath);
+      return parseDocx(buffer);
 
     case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-      return parseExcel(filepath);
+      return parseExcel(buffer);
 
     case "text/plain":
-      return parseText(filepath);
+      return parseText(buffer);
 
     default:
       throw new Error("Unsupported document type");

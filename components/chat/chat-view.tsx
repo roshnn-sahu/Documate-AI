@@ -146,6 +146,7 @@ export default function ChatView({ sessionId }: Props) {
                   key={message.id}
                   role={message.role}
                   content={message.content}
+                    sources={message.sources}
                 />
               ))}
 

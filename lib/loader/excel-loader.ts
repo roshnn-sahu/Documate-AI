@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 
-export async function parseExcel(filepath: string) {
-  const workbook = XLSX.readFile(filepath);
+export async function parseExcel(buffer: Buffer) {
+  const workbook = XLSX.read(buffer);
 
   let text = "";
 

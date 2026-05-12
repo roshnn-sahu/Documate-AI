@@ -1,12 +1,5 @@
-import fs from "fs/promises";
-
-export async function parseText(
-  filepath: string
-) {
-  const text = await fs.readFile(
-    filepath,
-    "utf-8"
-  );
+export async function parseText(buffer: Buffer) {
+  const text = buffer.toString("utf-8");
 
   return {
     text,

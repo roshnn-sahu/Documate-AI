@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       // save
       const saved = await saveFile(file, buffer);
       // parse
-      const parsed = await parseDocument(saved.filepath, file.type);
+      const parsed = await parseDocument(buffer, file.type);
       // ingest into RAG
       const ingestion = await ingestDocument({
         text: parsed.text,

@@ -1,12 +1,14 @@
 import { cn } from "@/lib/utils";
+import MessageSources from "./message-sources";
+import { SourceItem } from "@/types/source";
 
 interface MessageProps {
   role: "user" | "assistant";
-
   content: string;
+  sources?: SourceItem[];
 }
 
-export default function Message({ role, content }: MessageProps) {
+export default function Message({ role, content, sources }: MessageProps) {
   return (
     <div
       className={cn(
@@ -23,6 +25,7 @@ export default function Message({ role, content }: MessageProps) {
       >
         {content}
       </div>
+      {role === "assistant" && sources && <MessageSources sources={sources} />}
     </div>
   );
 }
