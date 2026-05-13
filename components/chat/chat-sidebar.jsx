@@ -62,12 +62,13 @@ import {
   Waypoints,
   Star,
 } from "lucide-react";
-import { HeroGradient } from "../hero-gradient";
-import AiInput from "@/components/chat/ai-input";
 import { useRouter } from "next/navigation";
+import { useTool } from "@/context/tool-context";
 
 export function ChatSidebar({ children }) {
+
   const router = useRouter();
+  const { runTool } =  useTool();
 
   const data = {
     user: {
@@ -96,6 +97,20 @@ export function ChatSidebar({ children }) {
         title: "AI Workspace",
         url: "/workspace",
         icon: <BotIcon />,
+        items: [
+          {
+            title: "Summery",
+            url: "#",
+          },
+          {
+            title: "Starred",
+            url: "#",
+          },
+          {
+            title: "Settings",
+            url: "#",
+          },
+        ],
       },
       {
         title: "Favourites",

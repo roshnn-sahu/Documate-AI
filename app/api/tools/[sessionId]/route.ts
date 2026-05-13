@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { sessionVectorStores } from "@/lib/rag/store";
-
 import { retrieveContext } from "@/lib/rag/retrieval";
-import { streamAnswer } from "@/lib/rag/stream";
+import { executeAITool } from "@/lib/rag/tool-executor";
 
 interface Props {
   params: {
@@ -13,10 +11,10 @@ interface Props {
 
 export async function POST(req: Request, { params }: Props) {
   try {
-    const { message } = await req.json();
+    const { tool, input } = await req.json();
 
     const vectorStore = sessionVectorStores.get(params.sessionId);
-    console.log("VECTORSTORE", vectorStore);
+
     if (!vectorStore) {
       return NextResponse.json(
         {
@@ -28,14 +26,15 @@ export async function POST(req: Request, { params }: Props) {
       );
     }
 
-    // retrieve relevant chunks
-    const docs = await retrieveContext(vectorStore, message);
-    const sources = docs.map((doc: any) => ({
-      content: doc.pageContent,
-      metadata: doc.metadata,
-    }));
+    // retrieve docs
+    const docs = await retrieveContext(vectorStore, input || "document");
 
-    const stream = await streamAnswer(docs, message);
+    // execute AI tool
+    const stream = await executeAITool({
+      tool,
+      docs,
+      input,
+    });
 
     const encoder = new TextEncoder();
 
@@ -44,7 +43,6 @@ export async function POST(req: Request, { params }: Props) {
         for await (const chunk of stream) {
           const token = chunk.content;
 
-          // Handle both string and array content formats from LangChain
           const text =
             typeof token === "string"
               ? token
@@ -63,14 +61,14 @@ export async function POST(req: Request, { params }: Props) {
     return new Response(readableStream, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
+
         "Transfer-Encoding": "chunked",
-        "x-sources": encodeURIComponent(JSON.stringify(sources)),
       },
     });
   } catch (error: any) {
     return NextResponse.json(
       {
-        error: error.message || "Chat failed",
+        error: error.message || "Tool failed",
       },
       {
         status: 500,

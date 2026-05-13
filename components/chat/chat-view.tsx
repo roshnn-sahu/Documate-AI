@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
 import { v4 as uuid } from "uuid";
-
 import { ChatMessage } from "@/types/chat";
-
+import ToolResult from "./tool-result";
+import { runAITool } from "@/lib/client/run-ai-tools";
+import { AIToolType } from "@/types/ai-tools";
+import { ToolProvider } from "@/context/tool-context";
 import {
   Conversation,
   ConversationContent,
@@ -25,6 +26,9 @@ export default function ChatView({ sessionId }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const [loading, setLoading] = useState(false);
+  const [toolLoading, setToolLoading] = useState(false);
+  const [toolResult, setToolResult] = useState("");
+  const [activeTool, setActiveTool] = useState<AIToolType | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -37,14 +41,11 @@ export default function ChatView({ sessionId }: Props) {
 
   const sendMessage = async (message: string) => {
     if (!message.trim() || loading) return;
-
     const userMessageId = uuid();
 
     const assistantMessageId = uuid();
-
     try {
       setLoading(true);
-
       // add user + empty assistant
       setMessages((prev) => [
         ...prev,
@@ -129,44 +130,113 @@ export default function ChatView({ sessionId }: Props) {
       setLoading(false);
     }
   };
+  const handleTool = async (tool: AIToolType) => {
+    try {
+      setToolLoading(true);
+
+      setToolResult("");
+
+      setActiveTool(tool);
+
+      const body = await runAITool({
+        sessionId,
+
+        tool,
+      });
+
+      const reader = body.getReader();
+
+      const decoder = new TextDecoder();
+
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        accumulated += chunk;
+        setToolResult(accumulated);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setToolLoading(false);
+    }
+  };
 
   return (
-    <div className="flex h-full flex-col">
-      <Conversation className="flex-1">
-        <ConversationContent>
-          {messages.length === 0 ? (
-            <ConversationEmptyState
-              title="Start conversation"
-              description="Ask questions about your uploaded documents"
-            />
-          ) : (
-            <div className="space-y-6">
-              {messages.map((message) => (
-                <Message
-                  key={message.id}
-                  role={message.role}
-                  content={message.content}
-                    sources={message.sources}
-                />
-              ))}
-
-              {loading && (
-                <div className="px-2 text-sm text-neutral-500">
-                  AI is thinking...
-                </div>
-              )}
-
-              <div ref={bottomRef} />
+    <>
+      <ToolProvider runTool={handleTool}>
+        <div className="flex h-full flex-1 flex-col">
+          {activeTool && (
+            <div className="border-b bg-neutral-50 p-4">
+              <ToolResult
+                title={activeTool}
+                content={toolLoading ? "Generating..." : toolResult}
+              />
             </div>
           )}
-        </ConversationContent>
+          <div className="flex gap-2 border-b p-4">
+            <button
+              onClick={() => handleTool("summary")}
+              className="rounded-lg border px-3 py-2 text-sm"
+            >
+              Summarize
+            </button>
 
-        <ConversationScrollButton />
-      </Conversation>
+            <button
+              onClick={() => handleTool("flashcards")}
+              className="rounded-lg border px-3 py-2 text-sm"
+            >
+              Flashcards
+            </button>
 
-      <div className="border-t bg-white p-4">
-        <AiInput isLoading={loading} onSend={sendMessage} />
-      </div>
-    </div>
+            <button
+              onClick={() => handleTool("quiz")}
+              className="rounded-lg border px-3 py-2 text-sm"
+            >
+              Quiz
+            </button>
+          </div>
+          <Conversation className="flex-1">
+            <ConversationContent>
+              {messages.length === 0 ? (
+                <ConversationEmptyState
+                  title="Start conversation"
+                  description="Ask questions about your uploaded documents"
+                />
+              ) : (
+                <div className="space-y-6">
+                  {messages.map((message) => (
+                    <Message
+                      key={message.id}
+                      role={message.role}
+                      content={message.content}
+                      sources={message.sources}
+                    />
+                  ))}
+
+                  {loading && (
+                    <div className="px-2 text-sm text-neutral-500">
+                      AI is thinking...
+                    </div>
+                  )}
+
+                  <div ref={bottomRef} />
+                </div>
+              )}
+            </ConversationContent>
+
+            <ConversationScrollButton />
+          </Conversation>
+
+          <div className="border-t bg-white p-4">
+            <AiInput isLoading={loading} onSend={sendMessage} />
+          </div>
+        </div>
+      </ToolProvider>
+    </>
   );
 }
