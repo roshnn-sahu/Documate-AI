@@ -3,7 +3,7 @@ import path from "path";
 import { v4 as uuid } from "uuid";
 
 export async function saveFile(file: File, buffer: Buffer) {
-  const uploadDir = path.join(process.cwd(), "uploads");
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
 
   await fs.mkdir(uploadDir, {
     recursive: true,

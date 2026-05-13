@@ -113,7 +113,7 @@ const AiInput = ({
       setLoading(false);
     }
   };
-  console.log(attachments, files);
+
   return (
     <div className={cn("flex w-full max-w-2xl flex-col gap-4", className)}>
       <input

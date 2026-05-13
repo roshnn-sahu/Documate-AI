@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const fileName = `${uuid()}-${file.name}`;
 
     // upload path
-    const uploadDir = path.join(process.cwd(), "uploads");
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
 
     await fs.mkdir(uploadDir, { recursive: true });
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     await fs.writeFile(filePath, buffer);
 
     // parse pdf
-    const pdfData = await pdfParse(buffer);
+    const pdfData = await PDFParse(buffer);
 
     return NextResponse.json({
       success: true,
