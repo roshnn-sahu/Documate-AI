@@ -4,16 +4,17 @@ import { retrieveContext } from "@/lib/rag/retrieval";
 import { executeAITool } from "@/lib/rag/tool-executor";
 
 interface Props {
-  params: {
+  params: Promise<{
     sessionId: string;
-  };
+  }>;
 }
 
 export async function POST(req: Request, { params }: Props) {
   try {
+    const { sessionId } = await params;
     const { tool, input } = await req.json();
 
-    const vectorStore = sessionVectorStores.get(params.sessionId);
+    const vectorStore = sessionVectorStores.get(sessionId);
 
     if (!vectorStore) {
       return NextResponse.json(

@@ -11,7 +11,7 @@ export default function ToolResult({
   if (!content) return null;
 
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm">
+    <div className="rounded-lg border bg-white p-5 shadow-sm">
       <div className="mb-3">
         <h2 className="text-lg font-semibold">
           {title}

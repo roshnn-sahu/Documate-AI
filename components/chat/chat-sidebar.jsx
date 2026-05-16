@@ -1,7 +1,4 @@
 "use client";
-
-import * as React from "react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,10 +62,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useTool } from "@/context/tool-context";
 
-export function ChatSidebar({ children }) {
+// Fixed syntax error and added ToolProvider support
 
+export function ChatSidebar({ children }) {
   const router = useRouter();
-  const { runTool } =  useTool();
+  const { runTool } = useTool();
 
   const data = {
     user: {
@@ -95,20 +93,28 @@ export function ChatSidebar({ children }) {
       },
       {
         title: "AI Workspace",
-        url: "/workspace",
+        url: "#",
         icon: <BotIcon />,
         items: [
           {
-            title: "Summery",
-            url: "#",
+            title: "Summarize",
+            url: "summarize",
           },
           {
-            title: "Starred",
-            url: "#",
+            title: "Flashcards",
+            url: "flashcards",
           },
           {
-            title: "Settings",
-            url: "#",
+            title: "Notes",
+            url: "notes",
+          },
+          {
+            title: "Quiz",
+            url: "quiz",
+          },
+          {
+            title: "Insights",
+            url: "insights",
           },
         ],
       },
@@ -144,7 +150,7 @@ export function ChatSidebar({ children }) {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" className="scrollbar-none">
         <SidebarHeader
           className="border-b"
           onClick={() => router.push("/chat")}
@@ -234,8 +240,27 @@ export function ChatSidebar({ children }) {
                       >
                         {item.icon}
                         <span>{item.title}</span>
+                        {item.items && (
+                          <ChevronRightIcon className="ml-auto transition-transform duration-100 group-data-open/collapsible:rotate-90" />
+                        )}
                       </CollapsibleTrigger>
                     </SidebarMenuButton>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item?.items?.map((subItem) => (
+                          <SidebarMenuSubItem
+                            key={subItem.title}
+                            onClick={() => runTool(subItem.url)}
+                          >
+                            <SidebarMenuSubButton asChild>
+                              <span className="cursor-pointer">
+                                {subItem.title}
+                              </span>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
               ))}
@@ -326,6 +351,7 @@ export function ChatSidebar({ children }) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
+
         <SidebarRail />
       </Sidebar>
       {/* chat section */}
@@ -386,7 +412,7 @@ export function ChatSidebar({ children }) {
           </div>
         </header>
 
-        <main className="flex flex-1 overflow-hidden bg-neutral-50/20 p-2">
+        <main className="relative flex flex-1 overflow-hidden bg-neutral-50/20 p-2">
           {children}
         </main>
       </SidebarInset>

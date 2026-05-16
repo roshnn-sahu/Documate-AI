@@ -1,17 +1,12 @@
 import ChatView from "@/components/chat/chat-view";
 
 interface Props {
-  params: {
-    sessionId: string;
-  };
+  params: Promise<{
+    session: string;
+  }>;
 }
 
-export default function SessionPage({
-  params,
-}: Props) {
-  return (
-    <ChatView
-      sessionId={params.sessionId}
-    />
-  );
+export default async function SessionPage({ params }: Props) {
+  const { session } = await params;
+  return <ChatView sessionId={session} />;
 }

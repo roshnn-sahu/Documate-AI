@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import { ChatMessage } from "@/types/chat";
 import ToolResult from "./tool-result";
 import { runAITool } from "@/lib/client/run-ai-tools";
 import { AIToolType } from "@/types/ai-tools";
-import { ToolProvider } from "@/context/tool-context";
+import { useTool } from "@/context/tool-context";
 import {
   Conversation,
   ConversationContent,
@@ -130,113 +130,103 @@ export default function ChatView({ sessionId }: Props) {
       setLoading(false);
     }
   };
-  const handleTool = async (tool: AIToolType) => {
-    try {
-      setToolLoading(true);
+  const handleTool = useCallback(
+    async (tool: AIToolType) => {
+      try {
+        setToolLoading(true);
 
-      setToolResult("");
+        setToolResult("");
 
-      setActiveTool(tool);
+        setActiveTool(tool);
 
-      const body = await runAITool({
-        sessionId,
+        const body = await runAITool({
+          sessionId,
 
-        tool,
-      });
+          tool,
+        });
 
-      const reader = body.getReader();
+        const reader = body.getReader();
 
-      const decoder = new TextDecoder();
+        const decoder = new TextDecoder();
 
-      let accumulated = "";
+        let accumulated = "";
 
-      while (true) {
-        const { done, value } = await reader.read();
+        while (true) {
+          const { done, value } = await reader.read();
 
-        if (done) break;
+          if (done) break;
 
-        const chunk = decoder.decode(value);
-        accumulated += chunk;
-        setToolResult(accumulated);
+          const chunk = decoder.decode(value);
+          accumulated += chunk;
+          setToolResult(accumulated);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setToolLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setToolLoading(false);
-    }
-  };
+    },
+    [sessionId],
+  );
+
+  const { registerRunTool } = useTool();
+
+  useEffect(() => {
+    registerRunTool(handleTool);
+    return () =>
+      registerRunTool(() => {
+        console.warn("No tool runner registered");
+      });
+  }, [registerRunTool, handleTool]);
 
   return (
     <>
-      <ToolProvider runTool={handleTool}>
-        <div className="flex h-full flex-1 flex-col">
-          {activeTool && (
-            <div className="border-b bg-neutral-50 p-4">
-              <ToolResult
-                title={activeTool}
-                content={toolLoading ? "Generating..." : toolResult}
+      <div className="relative flex h-full flex-1 flex-col">
+        {activeTool && (
+          <div className="border-b p-4">
+            <ToolResult
+              title={activeTool}
+              content={toolLoading ? "Generating..." : toolResult}
+            />
+          </div>
+        )}
+
+        <Conversation className="flex-1 overflow-auto">
+          <ConversationContent>
+            {messages.length === 0 ? (
+              <ConversationEmptyState
+                title="Start conversation"
+                description="Ask questions about your uploaded documents"
               />
-            </div>
-          )}
-          <div className="flex gap-2 border-b p-4">
-            <button
-              onClick={() => handleTool("summary")}
-              className="rounded-lg border px-3 py-2 text-sm"
-            >
-              Summarize
-            </button>
+            ) : (
+              <div className="space-y-6">
+                {messages.map((message) => (
+                  <Message
+                    key={message.id}
+                    role={message.role}
+                    content={message.content}
+                    sources={message.sources}
+                  />
+                ))}
 
-            <button
-              onClick={() => handleTool("flashcards")}
-              className="rounded-lg border px-3 py-2 text-sm"
-            >
-              Flashcards
-            </button>
+                {loading && (
+                  <div className="px-2 text-sm text-neutral-500">
+                    AI is thinking...
+                  </div>
+                )}
 
-            <button
-              onClick={() => handleTool("quiz")}
-              className="rounded-lg border px-3 py-2 text-sm"
-            >
-              Quiz
-            </button>
-          </div>
-          <Conversation className="flex-1">
-            <ConversationContent>
-              {messages.length === 0 ? (
-                <ConversationEmptyState
-                  title="Start conversation"
-                  description="Ask questions about your uploaded documents"
-                />
-              ) : (
-                <div className="space-y-6">
-                  {messages.map((message) => (
-                    <Message
-                      key={message.id}
-                      role={message.role}
-                      content={message.content}
-                      sources={message.sources}
-                    />
-                  ))}
+                <div ref={bottomRef} />
+              </div>
+            )}
+          </ConversationContent>
 
-                  {loading && (
-                    <div className="px-2 text-sm text-neutral-500">
-                      AI is thinking...
-                    </div>
-                  )}
+          <ConversationScrollButton />
+        </Conversation>
 
-                  <div ref={bottomRef} />
-                </div>
-              )}
-            </ConversationContent>
-
-            <ConversationScrollButton />
-          </Conversation>
-
-          <div className="border-t bg-white p-4">
-            <AiInput isLoading={loading} onSend={sendMessage} />
-          </div>
+        <div className="bg-white p-4">
+          <AiInput isLoading={loading} onSend={sendMessage} />
         </div>
-      </ToolProvider>
+      </div>
     </>
   );
 }

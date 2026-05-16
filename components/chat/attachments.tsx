@@ -18,7 +18,7 @@ import {
   XIcon,
 } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactNode } from "react";
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, forwardRef, useCallback, useContext, useMemo } from "react";
 
 // ============================================================================
 // Types
@@ -184,46 +184,44 @@ export type AttachmentProps = HTMLAttributes<HTMLDivElement> & {
   onRemove?: () => void;
 };
 
-export const Attachment = ({
-  data,
-  onRemove,
-  className,
-  children,
-  ...props
-}: AttachmentProps) => {
-  const { variant } = useAttachmentsContext();
-  const mediaCategory = getMediaCategory(data);
+export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>(
+  ({ data, onRemove, className, children, ...props }, ref) => {
+    const { variant } = useAttachmentsContext();
+    const mediaCategory = getMediaCategory(data);
 
-  const contextValue = useMemo<AttachmentContextValue>(
-    () => ({ data, mediaCategory, onRemove, variant }),
-    [data, mediaCategory, onRemove, variant]
-  );
+    const contextValue = useMemo<AttachmentContextValue>(
+      () => ({ data, mediaCategory, onRemove, variant }),
+      [data, mediaCategory, onRemove, variant]
+    );
 
-  return (
-    <AttachmentContext.Provider value={contextValue}>
-      <div
-        className={cn(
-          "group relative",
-          variant === "grid" && "size-24 overflow-hidden rounded-lg",
-          variant === "inline" && [
-            "flex h-8 cursor-pointer select-none items-center gap-1.5",
-            "rounded-md border border-border px-1.5",
-            "font-medium text-sm transition-all",
-            "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-          ],
-          variant === "list" && [
-            "flex w-full items-center gap-3 rounded-lg border p-3",
-            "hover:bg-accent/50",
-          ],
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    </AttachmentContext.Provider>
-  );
-};
+    return (
+      <AttachmentContext.Provider value={contextValue}>
+        <div
+          ref={ref}
+          className={cn(
+            "group relative",
+            variant === "grid" && "size-24 overflow-hidden rounded-lg",
+            variant === "inline" && [
+              "flex h-8 cursor-pointer select-none items-center gap-1.5",
+              "rounded-md border border-border px-1.5",
+              "font-medium text-sm transition-all",
+              "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+            ],
+            variant === "list" && [
+              "flex w-full items-center gap-3 rounded-lg border p-3",
+              "hover:bg-accent/50",
+            ],
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </AttachmentContext.Provider>
+    );
+  }
+);
+Attachment.displayName = "Attachment";
 
 // ============================================================================
 // AttachmentPreview - Media preview
