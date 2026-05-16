@@ -153,7 +153,7 @@ export function ChatSidebar({ children }) {
       <Sidebar collapsible="icon" className="scrollbar-none">
         <SidebarHeader
           className="border-b"
-          onClick={() => router.push("/chat")}
+          onClick={() => router.push("/chat/new")}
         >
           <SidebarMenu>
             <SidebarMenuItem>
@@ -204,7 +204,10 @@ export function ChatSidebar({ children }) {
           </SidebarMenu>
         </SidebarHeader>
 
-        <SidebarMenu className="mt-3 px-2" onClick={() => router.push("/chat")}>
+        <SidebarMenu
+          className="mt-3 px-2"
+          onClick={() => router.push("/chat/new")}
+        >
           <Collapsible asChild className="group/collapsible">
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -412,7 +415,7 @@ export function ChatSidebar({ children }) {
           </div>
         </header>
 
-        <main className="relative flex flex-1 overflow-hidden bg-neutral-50/20 p-2">
+        <main className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-neutral-50/20">
           {children}
         </main>
       </SidebarInset>

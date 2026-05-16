@@ -115,7 +115,9 @@ const AiInput = ({
   };
 
   return (
-    <div className={cn("flex w-full max-w-2xl flex-col gap-4 mx-auto", className)}>
+    <div
+      className={cn("mx-auto flex w-full max-w-2xl flex-col gap-4", className)}
+    >
       <input
         ref={fileInputRef}
         type="file"

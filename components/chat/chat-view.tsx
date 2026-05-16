@@ -181,9 +181,9 @@ export default function ChatView({ sessionId }: Props) {
 
   return (
     <>
-      <div className="relative flex h-full flex-1 flex-col">
+      <div className="relative flex h-full min-h-0 flex-1 flex-col">
         {activeTool && (
-          <div className="border-b p-4">
+          <div className="shrink-0 border-b p-4">
             <ToolResult
               title={activeTool}
               content={toolLoading ? "Generating..." : toolResult}
@@ -191,8 +191,8 @@ export default function ChatView({ sessionId }: Props) {
           </div>
         )}
 
-        <Conversation className="flex-1 overflow-auto">
-          <ConversationContent>
+        <Conversation className="relative min-h-0 flex-1 overflow-y-auto mask-b-from-80% ">
+          <ConversationContent className="mb-36">
             {messages.length === 0 ? (
               <ConversationEmptyState
                 title="Start conversation"
@@ -221,11 +221,14 @@ export default function ChatView({ sessionId }: Props) {
           </ConversationContent>
 
           <ConversationScrollButton />
+          <div className="fixed inset-x-0 bottom-0 mx-auto w-full z-20  p-4">
+            <AiInput
+              isLoading={loading}
+              onSend={sendMessage}
+              className=""
+            />
+          </div>
         </Conversation>
-
-        <div className="bg-white p-4">
-          <AiInput isLoading={loading} onSend={sendMessage} />
-        </div>
       </div>
     </>
   );
