@@ -191,8 +191,8 @@ export default function ChatView({ sessionId }: Props) {
           </div>
         )}
 
-        <Conversation className="relative min-h-0 flex-1 overflow-y-auto mask-b-from-80% ">
-          <ConversationContent className="mb-36">
+        <Conversation className="relative flex-1 min-h-0 overflow-y-auto [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
+          <ConversationContent className="pb-38">
             {messages.length === 0 ? (
               <ConversationEmptyState
                 title="Start conversation"
@@ -221,14 +221,13 @@ export default function ChatView({ sessionId }: Props) {
           </ConversationContent>
 
           <ConversationScrollButton />
-          <div className="fixed inset-x-0 bottom-0 mx-auto w-full z-20  p-4">
-            <AiInput
-              isLoading={loading}
-              onSend={sendMessage}
-              className=""
-            />
-          </div>
         </Conversation>
+
+        <div className="absolute bottom-0 inset-x-0 z-20 p-4 pointer-events-none">
+          <div className="pointer-events-auto">
+            <AiInput isLoading={loading} onSend={sendMessage} />
+          </div>
+        </div>
       </div>
     </>
   );
