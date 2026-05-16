@@ -187,6 +187,7 @@ export default function ChatView({ sessionId }: Props) {
             <ToolResult
               title={activeTool}
               content={toolLoading ? "Generating..." : toolResult}
+              onClose={() => setActiveTool(null)}
             />
           </div>
         )}
