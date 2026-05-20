@@ -59,7 +59,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <Button
               onClick={() => {
-                router.push("/chat");
+                router.push("/chat/new");
               }}
               variant="outline"
             >
