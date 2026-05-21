@@ -7,13 +7,28 @@ export function buildToolPrompt(
 ): string {
   switch (tool) {
     case "summary":
-      return `Summarize the following document clearly.
-      Context:${context}`;
- case "flashcards":
-      return `
-Generate study flashcards from the document.
+      return `Generate a professional markdown summary.
 
-Return question-answer pairs.
+        Include:
+        # Overview
+        # Key Points
+        # Important Insights
+        # Final Conclusion
+
+        Context:
+        ${context}
+`;
+    case "flashcards":
+      return `
+Generate markdown flashcards.
+
+Format:
+
+# Flashcards
+
+## Card 1
+Question:
+Answer:
 
 Context:
 ${context}
@@ -21,7 +36,19 @@ ${context}
 
     case "quiz":
       return `
-Generate multiple choice questions from the document.
+Generate a markdown quiz.
+
+Format:
+
+# Quiz
+
+## Question 1
+- A
+- B
+- C
+- D
+
+Answer: ...
 
 Context:
 ${context}

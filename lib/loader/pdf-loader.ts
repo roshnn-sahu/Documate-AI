@@ -2,10 +2,11 @@ import fs from "fs/promises";
 import {PDFParse} from "pdf-parse";
 
 export async function parsePdf(buffer: Buffer) {
-  const data = await PDFParse(buffer);
+  const parser = new PDFParse({ data: buffer });
+  const data = await parser.getText();
 
   return {
     text: data.text,
-    pages: data.numpages,
+    pages: data.total,
   };
 }

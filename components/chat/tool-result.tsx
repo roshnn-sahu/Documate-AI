@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 interface Props {
   title: string;
@@ -30,7 +31,9 @@ export default function ToolResult({
       </div>
 
       <div className="prose prose-sm max-w-none text-neutral-700">
-        {content}
+       <ReactMarkdown>
+    {content}
+  </ReactMarkdown>
       </div>
     </div>
   );

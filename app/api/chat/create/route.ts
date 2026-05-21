@@ -23,9 +23,7 @@ export async function POST(req: Request) {
     // if file uploaded
     if (file) {
       validateFile(file);
-
       const bytes = await file.arrayBuffer();
-
       const buffer = Buffer.from(bytes);
 
       // save

@@ -34,7 +34,8 @@ export async function POST(req: Request) {
     await fs.writeFile(filePath, buffer);
 
     // parse pdf
-    const pdfData = await PDFParse(buffer);
+    const parser = new PDFParse({ data: buffer });
+    const pdfData = await parser.getText();
 
     return NextResponse.json({
       success: true,
