@@ -16,8 +16,8 @@ export async function POST(req: Request, { params }: Props) {
     const { sessionId } = await params;
     const { message } = await req.json();
 
+    console.log("VECTORSTORE", message);
     const vectorStore = sessionVectorStores.get(sessionId);
-    console.log("VECTORSTORE", vectorStore);
     if (!vectorStore) {
       return NextResponse.json(
         {

@@ -15,8 +15,8 @@ import {
 } from "./conversation";
 
 import Message from "./message";
-
 import AiInput from "./ai-input";
+import { ToolsResults } from "@/types/tools-resultsults";
 
 interface Props {
   sessionId: string;
@@ -27,7 +27,7 @@ export default function ChatView({ sessionId }: Props) {
 
   const [loading, setLoading] = useState(false);
   const [toolLoading, setToolLoading] = useState(false);
-  const [toolResult, setToolResult] = useState("");
+  const [toolResult, setToolResult] = useState<ToolsResults | null>(null);
   const [activeTool, setActiveTool] = useState<AIToolType | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -130,13 +130,12 @@ export default function ChatView({ sessionId }: Props) {
       setLoading(false);
     }
   };
+
   const handleTool = useCallback(
     async (tool: AIToolType) => {
       try {
         setToolLoading(true);
-
         setToolResult("");
-
         setActiveTool(tool);
 
         const body = await runAITool({
@@ -146,7 +145,6 @@ export default function ChatView({ sessionId }: Props) {
         });
 
         const reader = body.getReader();
-
         const decoder = new TextDecoder();
 
         let accumulated = "";
@@ -158,6 +156,10 @@ export default function ChatView({ sessionId }: Props) {
 
           const chunk = decoder.decode(value);
           accumulated += chunk;
+          setToolResult({
+            tool,
+            content: accumulated,
+          });
           setToolResult(accumulated);
         }
       } catch (error) {
@@ -186,13 +188,14 @@ export default function ChatView({ sessionId }: Props) {
           <div className="shrink-0 border-b p-4">
             <ToolResult
               title={activeTool}
-              content={toolLoading ? "Generating..." : toolResult}
+              content={
+                toolLoading ? "Generating..." : toolResult?.content || ""
+              }
               onClose={() => setActiveTool(null)}
             />
           </div>
         )}
-
-        <Conversation className="relative flex-1 min-h-0 overflow-y-auto [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
+        <Conversation className="relative min-h-0 flex-1 overflow-y-auto [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
           <ConversationContent className="pb-38">
             {messages.length === 0 ? (
               <ConversationEmptyState
@@ -224,7 +227,7 @@ export default function ChatView({ sessionId }: Props) {
           <ConversationScrollButton />
         </Conversation>
 
-        <div className="absolute bottom-0 inset-x-0 z-20 p-4 pointer-events-none">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-4">
           <div className="pointer-events-auto">
             <AiInput isLoading={loading} onSend={sendMessage} />
           </div>
