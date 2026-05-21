@@ -16,7 +16,7 @@ import {
 
 import Message from "./message";
 import AiInput from "./ai-input";
-import { ToolsResults } from "@/types/tools-resultsults";
+import { ToolsResults } from "@/types/tools-results";
 
 interface Props {
   sessionId: string;
