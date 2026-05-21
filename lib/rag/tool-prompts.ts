@@ -7,96 +7,87 @@ export function buildToolPrompt(
 ): string {
   switch (tool) {
     case "summary":
-      return `Generate a professional markdown summary.
+      return `Generate study flashcards.
 
-        Include:
-        # Overview
-        # Key Points
-        # Important Insights
-        # Final Conclusion
+  STRICT FORMAT:
 
-        Context:
-        ${context}
-`;
-    case "flashcards":
-      return `
-Generate markdown flashcards.
+  # Flashcards
 
-Format:
+  ## Card 1
+  Question: What is ...?
+  Answer: ...
 
-# Flashcards
+  ## Card 2
+  Question: ...
+  Answer: ...
 
-## Card 1
-Question:
-Answer:
-
-Context:
-${context}
-`;
+  Context:
+  ${context}
+  `;
 
     case "quiz":
       return `
-Generate a markdown quiz.
+  Generate a markdown quiz.
 
-Format:
+  Format:
 
-# Quiz
+  # Quiz
 
-## Question 1
-- A
-- B
-- C
-- D
+  ## Question 1
+  - A
+  - B
+  - C
+  - D
 
-Answer: ...
+  Answer: ...
 
-Context:
-${context}
-`;
+  Context:
+  ${context}
+  `;
 
     case "notes":
       return `
-Generate structured notes from the document.
+  Generate structured notes from the document.
 
-Context:
-${context}
-`;
+  Context:
+  ${context}
+  `;
 
     case "insights":
       return `
-Extract key insights and important findings.
+  Extract key insights and important findings.
 
-Context:
-${context}
-`;
+  Context:
+  ${context}
+  `;
 
     case "translate":
       return `
-Translate the document into simple English.
+  Translate the document into simple English.
 
-Context:
-${context}
-`;
+  Context:
+  ${context}
+  `;
 
     case "compare":
       return `
-Compare the uploaded documents.
+  Compare the uploaded documents.
 
-Context:
-${context}
-`;
+  Context:
+  ${context}
+  `;
 
     default:
       return `
-You are an AI document assistant.
+  You are an AI document assistant.
 
-Answer ONLY using provided context.
+  Answer ONLY using provided context.
 
-Context:
-${context}
+  Context:
+  ${context}
 
-Question:
-${input}
-`;
+  Question:
+  ${input}
+  `;
   }
 }

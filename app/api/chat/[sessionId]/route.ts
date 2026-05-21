@@ -6,14 +6,13 @@ import { retrieveContext } from "@/lib/rag/retrieval";
 import { streamAnswer } from "@/lib/rag/stream";
 
 interface Props {
-  params: Promise<{
+  params: {
     sessionId: string;
-  }>;
+  };
 }
-
 export async function POST(req: Request, { params }: Props) {
   try {
-    const { sessionId } = await params;
+    const { sessionId } = params;
     const { message } = await req.json();
 
     console.log("VECTORSTORE", message);
