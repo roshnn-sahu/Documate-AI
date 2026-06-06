@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Header = () => {
   const router = useRouter();
@@ -12,19 +13,14 @@ const Header = () => {
         <div className="glass-pane border rounded-xl px-6 py-3 flex items-center justify-between shadow-lg bg-white/50 backdrop-blur-sm">
           <Link href="/" className="flex items-center gap-2">
             <div className="size-8 bg-linear-to-br from-rose-400 to-orange-400 rounded-lg flex items-center justify-center text-white shadow-sm shadow-rose-200/50">
-              <svg
-                className="size-5"
-                fill="none"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  clipRule="evenodd"
-                  d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
-                  fill="currentColor"
-                  fillRule="evenodd"
-                ></path>
-              </svg>
+              <Image
+                src="/logo.png"
+                alt="Hero Graphic"
+                width={50}
+                height={50}
+                className="rounded-full  p-1"
+              />
+             
             </div>
             <span className="text-[#1e293b] font-bold text-xl tracking-tight">
               Documate AI

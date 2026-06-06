@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { HeroGradient } from "./hero-gradient";
 import { Badge } from "./ui/badge";
+import Image from "next/image";
 
 const heroSection = () => {
   return (
@@ -67,8 +68,14 @@ const CenteralIntractiveGraphics = () => {
         {/* Glowing Center Core */}
         <div className="mb-8 flex justify-center">
           <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-rose-400 to-orange-400 shadow-lg shadow-rose-200/50">
-            <span className="text-2xl font-bold text-white">D</span>
-            {/* Subtle outer glow */}
+            <Image
+              src="/logo.png"
+              alt="Hero Graphic"
+              width={50}
+              height={50}
+              className="rounded-full  p-1"
+            />
+
             <div className="absolute inset-0 rounded-full bg-orange-400 opacity-20 blur-xl"></div>
           </div>
         </div>
