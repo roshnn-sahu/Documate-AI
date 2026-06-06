@@ -54,7 +54,7 @@ const CenteralIntractiveGraphics = () => {
   return (
     <div className="relative mx-auto mt-6 flex h-auto min-h-[460px] w-full max-w-4xl items-center justify-center">
       {/* Main Chat Interface Window */}
-      <div className="relative z-50 flex w-full max-w-[380px] flex-col rounded-[32px] border border-white bg-white p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]">
+      <div className="relative z-50 flex w-full max-w-[380px] flex-col rounded-[32px] border border-neutral-100 bg-white p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)]">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <X
@@ -67,13 +67,13 @@ const CenteralIntractiveGraphics = () => {
 
         {/* Glowing Center Core */}
         <div className="mb-8 flex justify-center">
-          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-rose-400 to-orange-400 shadow-lg shadow-rose-200/50">
+          <div className="bg-(image:--color-theme-gradient) relative flex h-16 w-16 items-center justify-center rounded-full shadow-lg shadow-rose-200/50">
             <Image
               src="/logo.png"
-              alt="Hero Graphic"
+              alt="Logo"
               width={50}
               height={50}
-              className="rounded-full  p-1"
+              className="rounded-full p-1"
             />
 
             <div className="absolute inset-0 rounded-full bg-orange-400 opacity-20 blur-xl"></div>
@@ -102,7 +102,7 @@ const CenteralIntractiveGraphics = () => {
                 type="text"
                 placeholder="Ask or search for anything"
                 className="flex-1 cursor-pointer bg-transparent text-[13px] font-medium whitespace-nowrap text-gray-700 placeholder-gray-400 outline-none"
-                readOnly
+              
               />
               <div className="ml-2 shrink-0 rounded-full border border-gray-200 p-1 text-gray-400 transition-colors hover:bg-gray-50">
                 <ChevronDown className="h-4 w-4" />
