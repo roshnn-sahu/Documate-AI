@@ -15,27 +15,24 @@ export async function POST(req: Request, { params }: Props) {
     const { sessionId } = await params;
     const { message } = await req.json();
 
-    console.log("VECTORSTORE", message);
     const vectorStore = sessionVectorStores.get(sessionId);
-    if (!vectorStore) {
-      return NextResponse.json(
-        {
-          error: "Session not found",
-        },
-        {
-          status: 404,
-        },
-      );
+
+    let stream;
+    let sources: any[] = [];
+
+    if (vectorStore) {
+      const docs = await retrieveContext(vectorStore, message);
+      sources = docs.map((doc: any) => ({
+        content: doc.pageContent,
+        metadata: doc.metadata,
+      }));
+
+      stream = await streamAnswer(docs, message);
+    } else {
+      const { streamNormalChat } = await import("@/lib/rag/stream-normal");
+
+      stream = await streamNormalChat(message);
     }
-
-    // retrieve relevant chunks
-    const docs = await retrieveContext(vectorStore, message);
-    const sources = docs.map((doc: any) => ({
-      content: doc.pageContent,
-      metadata: doc.metadata,
-    }));
-
-    const stream = await streamAnswer(docs, message);
 
     const encoder = new TextEncoder();
 

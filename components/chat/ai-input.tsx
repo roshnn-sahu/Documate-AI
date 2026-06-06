@@ -106,7 +106,7 @@ const AiInput = ({
         throw new Error(data.error);
       }
 
-      router.push(`/chat/${data.sessionId}`);
+      router.push(`/chat/${data.sessionId}?message=${encodeURIComponent(message)}`);
     } catch (error) {
       console.error(error);
     } finally {

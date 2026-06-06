@@ -17,6 +17,7 @@ import {
 import Message from "./message";
 import AiInput from "./ai-input";
 import { ToolsResults } from "@/types/tools-results";
+import { BotIcon } from "lucide-react";
 
 interface Props {
   sessionId: string;
@@ -170,6 +171,23 @@ export default function ChatView({ sessionId }: Props) {
     [sessionId],
   );
 
+  // Auto-send initial message passed via URL query param (?message=...)
+  const initialMessageSent = useRef(false);
+
+  useEffect(() => {
+    if (initialMessageSent.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const initialMsg = params.get("message");
+
+    if (initialMsg) {
+      initialMessageSent.current = true;
+      // Clean the URL so refreshing doesn't re-send
+      window.history.replaceState({}, "", `/chat/${sessionId}`);
+      sendMessage(initialMsg);
+    }
+  }, [sessionId, sendMessage]);
+
   const { registerRunTool } = useTool();
 
   useEffect(() => {
@@ -199,7 +217,8 @@ export default function ChatView({ sessionId }: Props) {
             {messages.length === 0 ? (
               <ConversationEmptyState
                 title="Start conversation"
-                description="Ask questions about your uploaded documents"
+                description="Upload documents or chat directly with AI"
+                icon={<BotIcon />}
               />
             ) : (
               <div className="space-y-6">
@@ -213,8 +232,13 @@ export default function ChatView({ sessionId }: Props) {
                 ))}
 
                 {loading && (
-                  <div className="px-2 text-sm text-neutral-500">
-                    AI is thinking...
+                  <div className="px-2">
+                    <span>
+                      <BotIcon size={16}/>
+                    </span>
+                    <span className="text-sm text-neutral-500">
+                      AI is thinking...
+                    </span>
                   </div>
                 )}
 

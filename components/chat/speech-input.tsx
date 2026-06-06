@@ -60,6 +60,7 @@ declare global {
 type SpeechInputMode = "speech-recognition" | "media-recorder" | "none";
 
 export type SpeechInputProps = ComponentProps<typeof Button> & {
+  mode?: SpeechInputMode;
   onTranscriptionChange?: (text: string) => void;
   /**
    * Callback for when audio is recorded using MediaRecorder fallback.
@@ -89,6 +90,7 @@ const detectSpeechInputMode = (): SpeechInputMode => {
 
 export const SpeechInput = ({
   className,
+  mode: modeProp,
   onTranscriptionChange,
   onAudioRecorded,
   lang = "en-US",
@@ -96,7 +98,7 @@ export const SpeechInput = ({
 }: SpeechInputProps) => {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [mode] = useState<SpeechInputMode>(detectSpeechInputMode);
+  const [mode] = useState<SpeechInputMode>(modeProp ?? detectSpeechInputMode);
   const [isRecognitionReady, setIsRecognitionReady] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);

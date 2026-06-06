@@ -16,15 +16,17 @@ export default function Message({ role, content, sources }: MessageProps) {
         role === "user" ? "justify-end" : "justify-start",
       )}
     >
-      <div
-        className={cn(
-          "max-w-3xl rounded-2xl px-4 py-3 whitespace-pre-wrap",
+      {content && (
+        <div
+          className={cn(
+            "max-w-3xl rounded-2xl px-4 py-3 whitespace-pre-wrap",
 
-          role === "user" ? "bg-black text-white" : "bg-background border",
-        )}
-      >
-        {content}
-      </div>
+            role === "user" ? "bg-black text-white" : "bg-background border",
+          )}
+        >
+          {content}
+        </div>
+      )}
       {role === "assistant" && sources && <MessageSources sources={sources} />}
     </div>
   );

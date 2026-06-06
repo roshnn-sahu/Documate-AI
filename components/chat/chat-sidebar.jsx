@@ -164,7 +164,7 @@ export function ChatSidebar({ children }) {
               >
                 <Button
                   size="icon-sm"
-                  className="flex size-8 items-center justify-center rounded-lg bg-(image:--color-theme-gradient) text-white shadow-sm shadow-rose-200/50"
+                  className="flex size-8 items-center justify-center rounded-full bg-(image:--color-theme-gradient) text-white shadow-sm shadow-rose-200/50"
                 >
                   <Image
                     src="/logo.png"
