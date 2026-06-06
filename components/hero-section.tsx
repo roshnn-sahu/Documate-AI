@@ -9,6 +9,7 @@ import {
   Home,
   MoreVertical,
   Bot,
+  BotIcon,
 } from "lucide-react";
 import { HeroGradient } from "./hero-gradient";
 import { Badge } from "./ui/badge";
@@ -67,7 +68,7 @@ const CenteralIntractiveGraphics = () => {
 
         {/* Glowing Center Core */}
         <div className="mb-8 flex justify-center">
-          <div className="bg-(image:--color-theme-gradient) relative flex h-16 w-16 items-center justify-center rounded-full shadow-lg shadow-rose-200/50">
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-(image:--color-theme-gradient) shadow-lg shadow-rose-200/50">
             <Image
               src="/logo.png"
               alt="Logo"
@@ -93,19 +94,18 @@ const CenteralIntractiveGraphics = () => {
 
         {/* Chat Input Field */}
         <div className="absolute right-6 bottom-6 left-6">
-          <div className="rounded-full bg-gradient-to-r from-rose-400 via-orange-300 to-yellow-300 p-[2px] shadow-sm transition-transform hover:scale-[1.02]">
+          <div className="rounded-full bg-(image:--color-theme-gradient) from-rose-400 via-orange-300 to-yellow-300 p-[2px] shadow-sm transition-transform hover:scale-[1.02]">
             <div className="flex items-center rounded-full bg-white px-3 py-[9px]">
-              <div className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-rose-400 shadow-inner">
-                <Sparkles className="h-3.5 w-3.5 text-white" />
+              <div className="mr-3 flex size-8 shrink-0 items-center justify-center rounded-full bg-rose-400 shadow-inner">
+                <BotIcon className="size-5 text-white" />
               </div>
               <input
                 type="text"
                 placeholder="Ask or search for anything"
                 className="flex-1 cursor-pointer bg-transparent text-[13px] font-medium whitespace-nowrap text-gray-700 placeholder-gray-400 outline-none"
-              
               />
               <div className="ml-2 shrink-0 rounded-full border border-gray-200 p-1 text-gray-400 transition-colors hover:bg-gray-50">
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="size-5" />
               </div>
             </div>
           </div>
