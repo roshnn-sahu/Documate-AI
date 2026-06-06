@@ -8,7 +8,7 @@ import { VariantProps } from "class-variance-authority"
 import { cn } from '@/lib/utils'
 
 function Tabs({
-  className,
+  className = "",
   orientation = "horizontal",
   ...props
 }) {
@@ -41,7 +41,7 @@ const tabsListVariants = cva(
 )
 
 function TabsList({
-  className,
+  className = "",
   variant = "default",
   ...props
 }) {
@@ -56,7 +56,7 @@ function TabsList({
 }
 
 function TabsTrigger({
-  className,
+  className = "",
   ...props
 }) {
   return (
@@ -75,7 +75,7 @@ function TabsTrigger({
 }
 
 function TabsContent({
-  className,
+  className = "",
   ...props
 }) {
   return (

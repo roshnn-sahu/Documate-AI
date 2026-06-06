@@ -99,7 +99,7 @@ export function ChatSidebar({ children }) {
         items: [
           {
             title: "Summarize",
-            url: "summarize",
+            url: "/workspace/summrize",
           },
           {
             title: "Flashcards",

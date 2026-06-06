@@ -135,7 +135,7 @@ export default function ChatView({ sessionId }: Props) {
     async (tool: AIToolType) => {
       try {
         setToolLoading(true);
-        setToolResult("");
+        setToolResult(null);
         setActiveTool(tool);
 
         const body = await runAITool({
@@ -160,7 +160,6 @@ export default function ChatView({ sessionId }: Props) {
             tool,
             content: accumulated,
           });
-          setToolResult(accumulated);
         }
       } catch (error) {
         console.error(error);
