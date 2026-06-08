@@ -11,12 +11,12 @@ export const model = new ChatOpenAI({
   },
 });
 export const ChatModel = new ChatOpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
+  apiKey: process.env.NVIDIA_API_KEY,
 
-  model: "google/gemma-4-26b-a4b-it:free",
+  model: "deepseek-ai/deepseek-v4-flash",
   temperature: 0.3,
   streaming: true,
   configuration: {
-    baseURL: "https://openrouter.ai/api/v1",
+    baseURL: "https://integrate.api.nvidia.com/v1",
   },
 });
