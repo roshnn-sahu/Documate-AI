@@ -18,6 +18,8 @@ import Message from "./message";
 import AiInput from "./ai-input";
 import { ToolsResults } from "@/types/tools-results";
 import { BotIcon } from "lucide-react";
+import { HeroGradient } from "../hero-gradient";
+import { LoaderOne } from "../ui/loader";
 
 interface Props {
   sessionId: string;
@@ -201,6 +203,7 @@ export default function ChatView({ sessionId }: Props) {
   return (
     <>
       <div className="relative flex h-full min-h-0 flex-1 flex-col">
+        <HeroGradient />
         {activeTool && (
           <div className="shrink-0 border-b p-4">
             <ToolResult
@@ -233,8 +236,8 @@ export default function ChatView({ sessionId }: Props) {
 
                 {loading && (
                   <div className="px-2">
-                    <span>
-                      <BotIcon size={16}/>
+                    <span className="flex gap-2">
+                      <BotIcon size={16} /> <LoaderOne />
                     </span>
                     <span className="text-sm text-neutral-500">
                       AI is thinking...

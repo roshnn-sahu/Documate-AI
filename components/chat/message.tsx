@@ -19,7 +19,7 @@ export default function Message({ role, content, sources }: MessageProps) {
       {content && (
         <div
           className={cn(
-            "max-w-3xl rounded-2xl px-4 py-3 whitespace-pre-wrap",
+            "max-w-3xl rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
 
             role === "user" ? "bg-black text-white" : "bg-background border",
           )}
