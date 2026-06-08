@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
-import { ChatMessage } from "@/types/chat";
+import { ChatMessage, MessageAttachment } from "@/types/chat";
 import ToolResult from "./tool-result";
 import { runAITool } from "@/lib/client/run-ai-tools";
 import { AIToolType } from "@/types/ai-tools";
@@ -42,13 +42,35 @@ export default function ChatView({ sessionId }: Props) {
     });
   }, [messages]);
 
-  const sendMessage = async (message: string) => {
-    if (!message.trim() || loading) return;
+  const sendMessage = async (message: string, files?: File[]) => {
+    if (loading) return;
+    if (!message.trim() && (!files || files.length === 0)) return;
     const userMessageId = uuid();
 
     const assistantMessageId = uuid();
     try {
       setLoading(true);
+
+      // Convert files to data URLs for display
+      let messageAttachments: MessageAttachment[] | undefined;
+      if (files && files.length > 0) {
+        messageAttachments = await Promise.all(
+          files.map(async (file, i) => {
+            const dataUrl = await new Promise<string>((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result as string);
+              reader.readAsDataURL(file);
+            });
+            return {
+              id: `att-${userMessageId}-${i}`,
+              filename: file.name,
+              mediaType: file.type,
+              url: dataUrl,
+            };
+          }),
+        );
+      }
+
       // add user + empty assistant
       setMessages((prev) => [
         ...prev,
@@ -56,6 +78,7 @@ export default function ChatView({ sessionId }: Props) {
           id: userMessageId,
           role: "user",
           content: message,
+          attachments: messageAttachments,
         },
         {
           id: assistantMessageId,
@@ -64,17 +87,27 @@ export default function ChatView({ sessionId }: Props) {
         },
       ]);
 
-      const response = await fetch(`/api/chat/${sessionId}`, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify({
-          message,
-        }),
-      });
+      // Send files via FormData if there are attachments, otherwise JSON
+      let response: Response;
+      if (files && files.length > 0) {
+        const formData = new FormData();
+        formData.append("message", message);
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+        response = await fetch(`/api/chat/${sessionId}`, {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        response = await fetch(`/api/chat/${sessionId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message }),
+        });
+      }
 
       if (!response.ok) {
         throw new Error("Failed to send message");
@@ -231,6 +264,7 @@ export default function ChatView({ sessionId }: Props) {
                     role={message.role}
                     content={message.content}
                     sources={message.sources}
+                    attachments={message.attachments}
                   />
                 ))}
 
