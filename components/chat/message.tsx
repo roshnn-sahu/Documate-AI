@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import MessageSources from "./message-sources";
 import { SourceItem } from "@/types/source";
 
@@ -17,15 +18,29 @@ export default function Message({ role, content, sources }: MessageProps) {
       )}
     >
       {content && (
-        <div
-          className={cn(
-            "max-w-3xl rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 8,
+              x: role === "user" ? 20 : -20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              x: 0,
+            }}
+            transition={{
+              duration: 0.1,
+              ease: "easeOut",
+            }}
+            className={cn(
+              "max-w-3xl rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
 
-            role === "user" ? "bg-black text-white" : "bg-background border",
-          )}
-        >
-          {content}
-        </div>
+              role === "user" ? "bg-black text-white" : "bg-background border",
+            )}
+          >
+            {content}
+          </motion.div>
       )}
       {role === "assistant" && sources && <MessageSources sources={sources} />}
     </div>

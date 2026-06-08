@@ -13,7 +13,7 @@ export const model = new ChatOpenAI({
 export const ChatModel = new ChatOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 
-  model: "nvidia/nemotron-3-ultra-550b-a55b:free",
+  model: "google/gemma-4-26b-a4b-it:free",
   temperature: 0.3,
   streaming: true,
   configuration: {

@@ -216,7 +216,7 @@ export default function ChatView({ sessionId }: Props) {
           </div>
         )}
         <Conversation className="relative min-h-0 flex-1 overflow-y-auto [mask-image:linear-gradient(to_bottom,black_75%,transparent_100%)]">
-          <ConversationContent className="pb-38">
+          <ConversationContent className="pb-40">
             {messages.length === 0 ? (
               <ConversationEmptyState
                 title="Start conversation"
