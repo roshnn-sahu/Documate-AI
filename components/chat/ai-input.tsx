@@ -34,7 +34,7 @@ import { SpeechInput } from "./speech-input";
 
 export const title = "AI with Voice";
 interface Props {
-  onSend?: (message: string) => void;
+  onSend?: (message: string, files: File[]) => void;
 
   loading?: boolean;
 }
@@ -45,7 +45,7 @@ const AiInput = ({
   isLoading,
 }: Props & {
   className?: string;
-  onSend?: (message: string) => void;
+  onSend?: (message: string, files: File[]) => void;
   isLoading?: boolean;
 }) => {
   const router = useRouter();
@@ -83,7 +83,7 @@ const AiInput = ({
       setLoading(true);
 
       if (onSend) {
-        onSend(message);
+        onSend(message, files);
         setMessage("");
         setFiles([]);
         return;
