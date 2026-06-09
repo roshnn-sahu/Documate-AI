@@ -1,0 +1,70 @@
+"use client";
+import React from "react";
+import { Button } from "./ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+const Header = () => {
+  const router = useRouter();
+  return (
+    <>
+      <nav className="fixed top-6 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 px-4">
+        <div className="glass-pane flex items-center justify-between rounded-xl border bg-white/50 px-6 py-3 shadow-lg backdrop-blur-sm">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="bg-(image:--color-theme-gradient) flex size-8 items-center justify-center rounded-lg text-white shadow-sm shadow-rose-200/50">
+              <Image
+                src="/logo.png"
+                alt="Hero Graphic"
+                width={50}
+                height={50}
+                className="rounded-full p-1"
+              />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-[#1e293b]">
+              Documate AI
+            </span>
+          </Link>
+          <div className="hidden items-center gap-8 md:flex">
+            <a
+              className="text-on-surface hover:text-primary text-sm font-semibold transition-colors"
+              href="#"
+            >
+              Product
+            </a>
+            <a
+              className="text-on-surface hover:text-primary text-sm font-semibold transition-colors"
+              href="#"
+            >
+              Integrations
+            </a>
+            <a
+              className="text-on-surface hover:text-primary text-sm font-semibold transition-colors"
+              href="#"
+            >
+              Security
+            </a>
+            <a
+              className="text-on-surface hover:text-primary text-sm font-semibold transition-colors"
+              href="#"
+            >
+              Pricing
+            </a>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => {
+                router.push("/chat/new");
+              }}
+              variant="outline"
+            >
+              Get Started
+            </Button>
+          </div>
+        </div>
+      </nav>
+    </>
+  );
+};
+
+export default Header;
