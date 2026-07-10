@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { sessionVectorStores } from "@/lib/rag/store";
 
+import { SystemMessage, HumanMessage } from "@langchain/core/messages";
+
 import { retrieveContext } from "@/lib/rag/retrieval";
 import { model } from "@/lib/rag/model";
 import { streamAnswer } from "@/lib/rag/stream";
@@ -73,8 +75,11 @@ export async function POST(req: Request, { params }: Props) {
 
       stream = await streamAnswer(docs, message);
     } else {
-      // No documents uploaded — plain chat with the same model
-      stream = await model.stream(message);
+      // No documents uploaded — plain chat with the same model & system identity
+      stream = await model.stream([
+        new SystemMessage("You are Documate AI — an intelligent document assistant. Answer questions conversationally and helpfully."),
+        new HumanMessage(message),
+      ]);
     }
 
     const encoder = new TextEncoder();
