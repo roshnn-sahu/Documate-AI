@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { sessionVectorStores } from "@/lib/rag/store";
 
 import { retrieveContext } from "@/lib/rag/retrieval";
+import { model } from "@/lib/rag/model";
 import { streamAnswer } from "@/lib/rag/stream";
 import { validateFile } from "@/lib/uploads/validate-file";
 import { saveFile } from "@/lib/uploads/save-file";
@@ -24,7 +25,7 @@ export async function POST(req: Request, { params }: Props) {
 
     const contentType = req.headers.get("content-type") || "";
     if (contentType.includes("multipart/form-data")) {
-      const formData = await req.formData();
+      const formData = await req.formData();``
       message = (formData.get("message") as string) || "";
       const allFiles = formData.getAll("files") as File[];
       files = allFiles.filter((f) => f instanceof File && f.size > 0);
@@ -72,9 +73,8 @@ export async function POST(req: Request, { params }: Props) {
 
       stream = await streamAnswer(docs, message);
     } else {
-      const { streamNormalChat } = await import("@/lib/rag/stream-normal");
-
-      stream = await streamNormalChat(message);
+      // No documents uploaded — plain chat with the same model
+      stream = await model.stream(message);
     }
 
     const encoder = new TextEncoder();
