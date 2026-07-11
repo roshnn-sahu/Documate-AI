@@ -13,13 +13,17 @@ import {
   BrainCircuit,
   Sparkles,
   BookOpen,
+  Search,
+  X,
+  Target,
+  Zap,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Flashcard {
   id: string;
@@ -78,6 +82,13 @@ const difficultyColors = {
   hard: "bg-rose-50 text-rose-700 border-rose-200",
 };
 
+const difficultyFilters = [
+  { label: "All", value: "all", icon: BrainCircuit },
+  { label: "Easy", value: "easy", icon: Sparkles },
+  { label: "Medium", value: "medium", icon: Target },
+  { label: "Hard", value: "hard", icon: Zap },
+];
+
 export default function FlashcardsPage() {
   const [flashcards, setFlashcards] = useState(sampleFlashcards);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -86,20 +97,44 @@ export default function FlashcardsPage() {
   const [knownCards, setKnownCards] = useState<Set<string>>(new Set());
   const [unknownCards, setUnknownCards] = useState<Set<string>>(new Set());
   const [showResults, setShowResults] = useState(false);
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const currentCard = flashcards[currentIndex];
-  const progress = ((currentIndex + 1) / flashcards.length) * 100;
+  const filteredFlashcards = flashcards.filter((card) => {
+    const matchesDifficulty =
+      difficultyFilter === "all" || card.difficulty === difficultyFilter;
+    const matchesSearch =
+      card.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.answer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDifficulty && matchesSearch;
+  });
+
+  const currentCard =
+    filteredFlashcards[Math.min(currentIndex, filteredFlashcards.length - 1)] ||
+    filteredFlashcards[0];
+  const progress =
+    filteredFlashcards.length > 0
+      ? ((currentIndex + 1) / filteredFlashcards.length) * 100
+      : 0;
+
+  const handleFilterChange = (value: string) => {
+    setDifficultyFilter(value);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+  };
 
   const handleFlip = useCallback(() => {
     setIsFlipped((prev) => !prev);
   }, []);
 
   const handleNext = useCallback(() => {
-    if (currentIndex < flashcards.length - 1) {
+    const maxIndex = filteredFlashcards.length - 1;
+    if (currentIndex < maxIndex) {
       setCurrentIndex((prev) => prev + 1);
       setIsFlipped(false);
     }
-  }, [currentIndex, flashcards.length]);
+  }, [currentIndex, filteredFlashcards.length]);
 
   const handlePrev = useCallback(() => {
     if (currentIndex > 0) {
@@ -142,8 +177,9 @@ export default function FlashcardsPage() {
     setShowResults(false);
   }, []);
 
-  const isLastCard = currentIndex === flashcards.length - 1;
-  const allStudied = studiedCards.size === flashcards.length;
+  const isLastCard =
+    currentIndex === filteredFlashcards.length - 1;
+  const allStudied = studiedCards.size === filteredFlashcards.length;
 
   if (showResults) {
     const accuracy =
@@ -286,11 +322,49 @@ export default function FlashcardsPage() {
         </div>
       </div>
 
+      {/* Search & Filter Tabs */}
+      <div className="space-y-3">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-neutral-400" strokeWidth={1.5} />
+          <input
+            type="text"
+            placeholder="Search flashcards..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-9 w-full rounded-lg border border-neutral-200 bg-white pl-9 pr-8 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-300 focus:ring-0 focus:outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+            >
+              <X className="size-3.5" strokeWidth={1.5} />
+            </button>
+          )}
+        </div>
+
+        <Tabs value={difficultyFilter} onValueChange={handleFilterChange}>
+          <TabsList>
+            {difficultyFilters.map((filter) => {
+              const Icon = filter.icon;
+              return (
+                <TabsTrigger key={filter.value} value={filter.value}>
+                  <Icon className="mr-1.5 size-3.5" />
+                  {filter.label}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </Tabs>
+      </div>
+
       {/* Progress */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs text-neutral-500">
           <span>
-            Card {currentIndex + 1} of {flashcards.length}
+            {filteredFlashcards.length > 0
+              ? `Card ${currentIndex + 1} of ${filteredFlashcards.length}`
+              : "No cards match"}
           </span>
           <span>{Math.round(progress)}% complete</span>
         </div>
@@ -321,7 +395,7 @@ export default function FlashcardsPage() {
         <div className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5">
           <BookOpen className="size-3.5 text-blue-500" />
           <span className="text-xs font-medium text-blue-700">
-            {flashcards.length - studiedCards.size} Remaining
+            {filteredFlashcards.length - studiedCards.size} Remaining
           </span>
         </div>
       </div>
@@ -454,7 +528,9 @@ export default function FlashcardsPage() {
           Previous
         </Button>
         <span className="text-xs text-neutral-400">
-          {currentIndex + 1} / {flashcards.length}
+          {filteredFlashcards.length > 0
+            ? `${currentIndex + 1} / ${filteredFlashcards.length}`
+            : "0 / 0"}
         </span>
         <Button
           variant="outline"

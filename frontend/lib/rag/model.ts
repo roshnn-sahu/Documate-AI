@@ -1,13 +1,16 @@
-import { ChatOpenAI } from "@langchain/openai";
+import { OpenAIEmbeddings } from "@langchain/openai";
 import { ChatGroq } from "@langchain/groq";
 
-export const model = new ChatOpenAI({
+// Document embeddings — OpenRouter / Nvidia Nemotron
+export const model = new OpenAIEmbeddings({
   apiKey: process.env.OPENROUTER_API_KEY,
-  configuration: {
- baseURL: "https://openrouter.ai/api/v1",
-  }
+  model: "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+  configuration: {  
+    baseURL: "https://openrouter.ai/api/v1",  
+  },
 });
 
+// Chat model — Groq / Llama 3.1 8B
 export const ChatModel = new ChatGroq({
   apiKey: process.env.GROQ_API_KEY,
   model: "llama-3.1-8b-instant",

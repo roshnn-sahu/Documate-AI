@@ -14,6 +14,9 @@ import {
   FileText,
   Tag,
   Sparkles,
+  List,
+  Star,
+  History,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Note {
   id: string;
@@ -107,6 +111,12 @@ function formatDate(dateString: string) {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+const noteFilters = [
+  { label: "All", value: "all", icon: List },
+  { label: "Pinned", value: "pinned", icon: Star },
+  { label: "Recent", value: "recent", icon: History },
+];
+
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>(sampleNotes);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -114,8 +124,9 @@ export default function NotesPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+  const [noteFilter, setNoteFilter] = useState("all");
 
-  const filteredNotes = notes.filter(
+  const searchedNotes = notes.filter(
     (note) =>
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -123,6 +134,20 @@ export default function NotesPage() {
         tag.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
   );
+
+  const filteredNotes = searchedNotes.filter((note) => {
+    if (noteFilter === "pinned") return note.pinned;
+    if (noteFilter === "recent") return true; // all are shown, sorted by date
+    return true;
+  }).sort((a, b) => {
+    if (noteFilter === "recent") {
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    }
+    // Default: pinned first, then by updatedAt
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
 
   const pinnedNotes = filteredNotes.filter((n) => n.pinned);
   const unpinnedNotes = filteredNotes.filter((n) => !n.pinned);
@@ -215,14 +240,30 @@ export default function NotesPage() {
               <Plus className="size-4" />
             </Button>
           </div>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-neutral-400" />
-            <Input
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 rounded-lg pl-8 text-xs"
-            />
+          <div className="space-y-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-neutral-400" />
+              <Input
+                placeholder="Search notes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-8 rounded-lg pl-8 text-xs"
+              />
+            </div>
+
+            <Tabs value={noteFilter} onValueChange={setNoteFilter}>
+              <TabsList className="w-full">
+                {noteFilters.map((filter) => {
+                  const Icon = filter.icon;
+                  return (
+                    <TabsTrigger key={filter.value} value={filter.value} className="flex-1">
+                      <Icon className="mr-1 size-3" />
+                      {filter.label}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </Tabs>
           </div>
         </div>
 
