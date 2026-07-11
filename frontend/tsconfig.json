@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-, "node_modules/theme-provider.tsx", "context/tool-context.tss"  ],
+  ],
   "exclude": [
     "node_modules"
   ]

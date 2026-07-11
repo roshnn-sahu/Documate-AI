@@ -1,4 +1,4 @@
-import { model } from "./model";
+import { ChatModel } from "./model";
 
 import { buildPrompt } from "./prompt";
 
@@ -7,7 +7,7 @@ export async function generateAnswer(docs: any[], question: string) {
 
   const prompt = buildPrompt(context, question);
 
-  const response = await model.stream(prompt);
+  const response = await ChatModel.stream(prompt);
 
   return response;
 }

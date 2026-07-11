@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 
 import { sessionVectorStores } from "@/lib/rag/store";
 
-import { SystemMessage, HumanMessage } from "@langchain/core/messages";
-
 import { retrieveContext } from "@/lib/rag/retrieval";
 import { model } from "@/lib/rag/model";
+import { streamNormalChat } from "@/lib/rag/stream-normal";
 import { streamAnswer } from "@/lib/rag/stream";
 import { validateFile } from "@/lib/uploads/validate-file";
 import { saveFile } from "@/lib/uploads/save-file";
@@ -26,8 +25,9 @@ export async function POST(req: Request, { params }: Props) {
     let files: File[] = [];
 
     const contentType = req.headers.get("content-type") || "";
+    
     if (contentType.includes("multipart/form-data")) {
-      const formData = await req.formData();``
+      const formData = await req.formData();
       message = (formData.get("message") as string) || "";
       const allFiles = formData.getAll("files") as File[];
       files = allFiles.filter((f) => f instanceof File && f.size > 0);
@@ -75,11 +75,8 @@ export async function POST(req: Request, { params }: Props) {
 
       stream = await streamAnswer(docs, message);
     } else {
-      // No documents uploaded — plain chat with the same model & system identity
-      stream = await model.stream([
-        new SystemMessage("You are Documate AI — an intelligent document assistant. Answer questions conversationally and helpfully."),
-        new HumanMessage(message),
-      ]);
+      // No documents uploaded — plain chat via streamNormalChat
+      stream = await streamNormalChat(message);
     }
 
     const encoder = new TextEncoder();

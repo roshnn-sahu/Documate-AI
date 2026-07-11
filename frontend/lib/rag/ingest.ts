@@ -1,11 +1,26 @@
-new Document({
-  pageContent: chunk,
+import { Document } from "@langchain/core/documents";
 
-  metadata: {
-    fileName,
-
-    source: filePath,
-
-    chunkIndex: index,
-  },
-});
+/**
+ * Create a LangChain Document from a text chunk with metadata.
+ * Used internally by the chunking pipeline.
+ */
+export function createDocument({
+  chunk,
+  fileName,
+  filePath,
+  index,
+}: {
+  chunk: string;
+  fileName?: string;
+  filePath?: string;
+  index: number;
+}) {
+  return new Document({
+    pageContent: chunk,
+    metadata: {
+      fileName,
+      source: filePath,
+      chunkIndex: index,
+    },
+  });
+}

@@ -103,19 +103,19 @@ export function ChatSidebar({ children }) {
           },
           {
             title: "Flashcards",
-            url: "flashcards",
+            url: "/workspace/flashcards",
           },
           {
             title: "Notes",
-            url: "notes",
+            url: "/workspace/notes",
           },
           {
             title: "Quiz",
-            url: "quiz",
+            url: "/workspace/quiz",
           },
           {
             title: "Insights",
-            url: "insights",
+            url: "/workspace/insights",
           },
         ],
       },

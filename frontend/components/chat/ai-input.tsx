@@ -106,7 +106,9 @@ const AiInput = ({
         throw new Error(data.error);
       }
 
-      router.push(`/chat/${data.sessionId}?message=${encodeURIComponent(message)}`);
+      router.push(
+        `/chat/${data.sessionId}?message=${encodeURIComponent(message)}`,
+      );
     } catch (error) {
       console.error(error);
     } finally {
@@ -136,7 +138,7 @@ const AiInput = ({
       <InputGroup className="bg-background has-[[data-slot=attachments]]:flex-col has-[[data-slot=attachments]]:items-start">
         {attachments.length > 0 && (
           <Attachments
-            variant="inline"
+            variant="grid"
             data-slot="attachments"
             className="w-full border-b p-3"
           >

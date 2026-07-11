@@ -1,4 +1,4 @@
-import { model } from "./model";
+import { ChatModel } from "./model";
 
 import { buildToolPrompt } from "./tool-prompts";
 
@@ -22,7 +22,7 @@ export async function executeAITool({tool,docs,input,
     );
 
   const stream =
-    await model.stream(prompt);
+    await ChatModel.stream(prompt);
 
   return stream;
 }

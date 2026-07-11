@@ -169,8 +169,8 @@ export default function UploadDropzone() {
     },
   });
 
-  // Omit conflicting drag event handlers that Framer Motion overrides
-  const { onDrag, onDragStart, onDragEnd, ...dropzoneProps } = getRootProps();
+  // Omit conflicting drag and animation event handlers that Framer Motion overrides
+  const { onDrag, onDragStart, onDragEnd, onAnimationStart, ...dropzoneProps } = getRootProps();
 
   return (
     <div className="space-y-6">
