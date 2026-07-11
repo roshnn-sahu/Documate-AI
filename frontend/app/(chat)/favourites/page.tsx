@@ -11,11 +11,9 @@ import {
   Heart,
   Clock,
   Trash2,
-  ExternalLink,
   FolderHeart,
   Sparkles,
   MoreHorizontal,
-  Pin,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

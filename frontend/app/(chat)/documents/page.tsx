@@ -253,67 +253,9 @@ export default function DocumentsPage() {
 
           <AnimatePresence mode="popLayout">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredDocuments.map((doc, index) => {
-                const { icon: Icon, color } = getFileIcon(doc.ext);
-
-                return (
-                  <motion.div
-                    key={doc.id}
-                    layout
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 25,
-                      delay: index * 0.04,
-                    }}
-                    className="group relative flex flex-col gap-3 rounded-xl border border-neutral-100 bg-white p-4 shadow-xs transition-all hover:border-neutral-200 hover:shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex size-10 items-center justify-center rounded-lg border border-neutral-100 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800">
-                        <Icon className={cn("size-4.5", color)} strokeWidth={1.5} />
-                      </div>
-                      <Badge variant="outline" className="border-dashed text-[10px] font-semibold">
-                        {doc.ext}
-                      </Badge>
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-neutral-800 dark:text-neutral-200">
-                        {doc.name}
-                      </p>
-                    </div>
-
-                    <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-400 dark:text-neutral-500">
-                      <span className="flex items-center gap-1">
-                        <HardDrive className="size-3" strokeWidth={1.5} />
-                        {formatSize(doc.size)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <CalendarDays className="size-3" strokeWidth={1.5} />
-                        {formatDate(doc.uploadedAt)}
-                      </span>
-                    </div>
-
-                    <div className="absolute top-3 right-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                      <button
-                        className="flex size-7 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-400 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
-                        aria-label={`Open ${doc.name}`}
-                      >
-                        <ExternalLink className="size-3" strokeWidth={1.5} />
-                      </button>
-                      <button
-                        className="flex size-7 items-center justify-center rounded-lg border border-red-200 bg-white text-red-400 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-500 dark:border-red-900 dark:bg-neutral-800 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-400"
-                        aria-label={`Delete ${doc.name}`}
-                      >
-                        <Trash2 className="size-3" strokeWidth={1.5} />
-                      </button>
-                    </div>
-                  </motion.div>
-                );
-              })}
+              {filteredDocuments.map((doc, index) => (
+                <DocCard key={doc.id} doc={doc} index={index} />
+              ))}
             </div>
           </AnimatePresence>
         </>
@@ -329,5 +271,71 @@ export default function DocumentsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+interface DocCardProps {
+  doc: DocumentItem;
+  index: number;
+}
+
+function DocCard({ doc, index }: DocCardProps) {
+  const { icon: Icon, color } = getFileIcon(doc.ext);
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+        delay: index * 0.04,
+      }}
+      className="group relative flex flex-col gap-3 rounded-xl border border-neutral-100 bg-white p-4 shadow-xs transition-all hover:border-neutral-200 hover:shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700"
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex size-10 items-center justify-center rounded-lg border border-neutral-100 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800">
+          <Icon className={cn("size-4.5", color)} strokeWidth={1.5} />
+        </div>
+        <Badge variant="outline" className="border-dashed text-[10px] font-semibold">
+          {doc.ext}
+        </Badge>
+      </div>
+
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-neutral-800 dark:text-neutral-200">
+          {doc.name}
+        </p>
+      </div>
+
+      <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-400 dark:text-neutral-500">
+        <span className="flex items-center gap-1">
+          <HardDrive className="size-3" strokeWidth={1.5} />
+          {formatSize(doc.size)}
+        </span>
+        <span className="flex items-center gap-1">
+          <CalendarDays className="size-3" strokeWidth={1.5} />
+          {formatDate(doc.uploadedAt)}
+        </span>
+      </div>
+
+      <div className="absolute top-3 right-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          className="flex size-7 items-center justify-center rounded-lg border border-neutral-200 bg-white text-neutral-400 transition-colors hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:border-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
+          aria-label={`Open ${doc.name}`}
+        >
+          <ExternalLink className="size-3" strokeWidth={1.5} />
+        </button>
+        <button
+          className="flex size-7 items-center justify-center rounded-lg border border-red-200 bg-white text-red-400 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-500 dark:border-red-900 dark:bg-neutral-800 dark:hover:border-red-800 dark:hover:bg-red-950/30 dark:hover:text-red-400"
+          aria-label={`Delete ${doc.name}`}
+        >
+          <Trash2 className="size-3" strokeWidth={1.5} />
+        </button>
+      </div>
+    </motion.div>
   );
 }
