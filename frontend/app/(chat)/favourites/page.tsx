@@ -43,7 +43,8 @@ const sampleFavourites: FavouriteItem[] = [
   {
     id: "fav-1",
     title: "Q4 Financial Report 2025",
-    description: "Annual financial report with revenue breakdown and growth projections",
+    description:
+      "Annual financial report with revenue breakdown and growth projections",
     type: "document",
     addedAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     tags: ["finance", "quarterly"],
@@ -52,7 +53,8 @@ const sampleFavourites: FavouriteItem[] = [
   {
     id: "fav-2",
     title: "RAG Architecture Notes",
-    description: "Comprehensive notes on retrieval-augmented generation pipeline design",
+    description:
+      "Comprehensive notes on retrieval-augmented generation pipeline design",
     type: "note",
     addedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     tags: ["ai", "architecture"],
@@ -61,7 +63,8 @@ const sampleFavourites: FavouriteItem[] = [
   {
     id: "fav-3",
     title: "Machine Learning Fundamentals",
-    description: "Flashcard set covering core ML concepts, algorithms, and best practices",
+    description:
+      "Flashcard set covering core ML concepts, algorithms, and best practices",
     type: "flashcard",
     addedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
     tags: ["ml", "study"],
@@ -70,7 +73,8 @@ const sampleFavourites: FavouriteItem[] = [
   {
     id: "fav-4",
     title: "Product Requirements Specification",
-    description: "Detailed product requirements for the AI document search platform",
+    description:
+      "Detailed product requirements for the AI document search platform",
     type: "document",
     addedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
     tags: ["product", "requirements"],
@@ -79,7 +83,8 @@ const sampleFavourites: FavouriteItem[] = [
   {
     id: "fav-5",
     title: "Vector Embeddings Study Guide",
-    description: "Key concepts and techniques for understanding vector embeddings in search",
+    description:
+      "Key concepts and techniques for understanding vector embeddings in search",
     type: "flashcard",
     addedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
     tags: ["search", "embeddings"],
@@ -88,7 +93,8 @@ const sampleFavourites: FavouriteItem[] = [
   {
     id: "fav-6",
     title: "Team Meeting Notes - Q4 Planning",
-    description: "Action items and key decisions from the quarterly planning session",
+    description:
+      "Action items and key decisions from the quarterly planning session",
     type: "note",
     addedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
     tags: ["meeting", "planning"],
@@ -144,7 +150,9 @@ export default function FavouritesPage() {
     const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      item.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
     const matchesTab = activeTab === "all" || item.type === activeTab;
     return matchesSearch && matchesTab;
   });
@@ -155,9 +163,7 @@ export default function FavouritesPage() {
 
   const handleStar = (id: string) => {
     setFavourites((prev) =>
-      prev.map((f) =>
-        f.id === id ? { ...f, starred: !f.starred } : f
-      )
+      prev.map((f) => (f.id === id ? { ...f, starred: !f.starred } : f)),
     );
   };
 
@@ -167,7 +173,7 @@ export default function FavouritesPage() {
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-amber-50">
-            <Star className="size-5 text-amber-500 fill-amber-500" />
+            <Star className="size-5 fill-amber-500 text-amber-500" />
           </div>
           <div>
             <h1 className="font-bricolage text-xl font-bold text-neutral-900">
@@ -186,18 +192,21 @@ export default function FavouritesPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-neutral-400" strokeWidth={1.5} />
+        <Search
+          className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-neutral-400"
+          strokeWidth={1.5}
+        />
         <input
           type="text"
           placeholder="Search favourites..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-10 w-full rounded-xl border border-neutral-200 bg-white pl-10 pr-9 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-300 focus:ring-0 focus:outline-none"
+          className="h-10 w-full rounded-xl border border-neutral-200 bg-white pr-9 pl-10 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-300 focus:ring-0 focus:outline-none"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-neutral-400 transition-colors hover:text-neutral-600"
           >
             <X className="size-4" strokeWidth={1.5} />
           </button>
@@ -207,22 +216,20 @@ export default function FavouritesPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="all">
-            <FolderHeart className="mr-1.5 size-3.5" />
-            All
-          </TabsTrigger>
-          <TabsTrigger value="document">
-            <FileText className="mr-1.5 size-3.5" />
-            Documents
-          </TabsTrigger>
-          <TabsTrigger value="note">
-            <BookOpen className="mr-1.5 size-3.5" />
-            Notes
-          </TabsTrigger>
-          <TabsTrigger value="flashcard">
-            <GraduationCap className="mr-1.5 size-3.5" />
-            Flashcards
-          </TabsTrigger>
+          {[
+            { label: "All", value: "all", icon: FolderHeart },
+            { label: "Documents", value: "document", icon: FileText },
+            { label: "Notes", value: "note", icon: BookOpen },
+            { label: "Flashcards", value: "flashcard", icon: GraduationCap },
+          ].map((filter) => {
+            const Icon = filter.icon;
+            return (
+              <TabsTrigger key={filter.value} value={filter.value}>
+                <Icon className="mr-1.5 size-3.5" />
+                {filter.label}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">
@@ -237,7 +244,9 @@ export default function FavouritesPage() {
               </div>
               <div className="space-y-1">
                 <p className="font-medium text-neutral-600">
-                  {searchQuery ? "No favourites match your search" : "No favourites yet"}
+                  {searchQuery
+                    ? "No favourites match your search"
+                    : "No favourites yet"}
                 </p>
                 <p className="max-w-xs text-xs text-neutral-400">
                   {searchQuery
@@ -250,7 +259,8 @@ export default function FavouritesPage() {
             <>
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-xs text-neutral-400">
-                  {filteredFavourites.length} item{filteredFavourites.length !== 1 ? "s" : ""}
+                  {filteredFavourites.length} item
+                  {filteredFavourites.length !== 1 ? "s" : ""}
                   {activeTab !== "all" ? ` (${activeTab})` : ""}
                 </span>
               </div>
@@ -282,10 +292,13 @@ export default function FavouritesPage() {
                             className={cn(
                               "flex size-10 items-center justify-center rounded-lg border",
                               config.bg,
-                              config.border
+                              config.border,
                             )}
                           >
-                            <Icon className={cn("size-4.5", config.color)} strokeWidth={1.5} />
+                            <Icon
+                              className={cn("size-4.5", config.color)}
+                              strokeWidth={1.5}
+                            />
                           </div>
                           <div className="flex gap-1">
                             <Badge
@@ -293,19 +306,24 @@ export default function FavouritesPage() {
                               className={cn(
                                 "border-dashed text-[10px] font-semibold",
                                 config.bg,
-                                config.color
+                                config.color,
                               )}
                             >
                               {config.label}
                             </Badge>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <button className="flex size-7 items-center justify-center rounded-lg text-neutral-400 opacity-0 transition-opacity hover:bg-neutral-100 hover:text-neutral-600 group-hover:opacity-100">
-                                  <MoreHorizontal className="size-3.5" strokeWidth={1.5} />
+                                <button className="flex size-7 items-center justify-center rounded-lg text-neutral-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-neutral-100 hover:text-neutral-600">
+                                  <MoreHorizontal
+                                    className="size-3.5"
+                                    strokeWidth={1.5}
+                                  />
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-36">
-                                <DropdownMenuItem onClick={() => handleStar(item.id)}>
+                                <DropdownMenuItem
+                                  onClick={() => handleStar(item.id)}
+                                >
                                   <Star className="mr-2 size-3.5" />
                                   {item.starred ? "Unstar" : "Star"}
                                 </DropdownMenuItem>
@@ -358,7 +376,10 @@ export default function FavouritesPage() {
                         {/* Star indicator */}
                         {item.starred && (
                           <div className="absolute top-3 left-3">
-                            <Star className="size-3.5 text-amber-400 fill-amber-400" strokeWidth={1.5} />
+                            <Star
+                              className="size-3.5 fill-amber-400 text-amber-400"
+                              strokeWidth={1.5}
+                            />
                           </div>
                         )}
                       </motion.div>

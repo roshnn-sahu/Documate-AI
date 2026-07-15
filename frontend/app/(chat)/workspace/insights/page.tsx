@@ -13,6 +13,9 @@ import {
   ArrowDownRight,
   Download,
   Filter,
+  LayoutDashboard,
+  BarChart3,
+  Hash,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -210,9 +213,19 @@ export default function InsightsPage() {
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-          <TabsTrigger value="topics">Topics</TabsTrigger>
+          {[
+            { label: "Overview", value: "overview", icon: LayoutDashboard },
+            { label: "Activity", value: "activity", icon: BarChart3 },
+            { label: "Topics", value: "topics", icon: Hash },
+          ].map((filter) => {
+            const Icon = filter.icon;
+            return (
+              <TabsTrigger key={filter.value} value={filter.value}>
+                <Icon className="mr-1.5 size-3.5" />
+                {filter.label}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-6">

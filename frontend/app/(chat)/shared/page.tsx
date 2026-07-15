@@ -202,18 +202,19 @@ export default function SharedPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="all">
-            <Globe className="mr-1.5 size-3.5" />
-            All
-          </TabsTrigger>
-          <TabsTrigger value="incoming">
-            <Share2 className="mr-1.5 size-3.5" />
-            Shared with me
-          </TabsTrigger>
-          <TabsTrigger value="outgoing">
-            <Users className="mr-1.5 size-3.5" />
-            Shared by me
-          </TabsTrigger>
+          {[
+            { label: "All", value: "all", icon: Globe },
+            { label: "Shared with me", value: "incoming", icon: Share2 },
+            { label: "Shared by me", value: "outgoing", icon: Users },
+          ].map((filter) => {
+            const Icon = filter.icon;
+            return (
+              <TabsTrigger key={filter.value} value={filter.value}>
+                <Icon className="mr-1.5 size-3.5" />
+                {filter.label}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value={activeTab} className="mt-6">
