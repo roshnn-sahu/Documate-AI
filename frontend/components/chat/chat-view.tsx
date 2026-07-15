@@ -110,7 +110,14 @@ export default function ChatView({ sessionId }: Props) {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to send message");
+        let serverMessage = "Failed to send message";
+        try {
+          const errData = await response.json();
+          if (errData?.error) serverMessage = errData.error;
+        } catch {
+          // response wasn't JSON — keep the default message
+        }
+        throw new Error(serverMessage);
       }
 
       const sourcesHeader = response.headers.get("x-sources");
@@ -148,8 +155,11 @@ export default function ChatView({ sessionId }: Props) {
           ),
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Streaming error:", error);
+
+      const detail =
+        error?.message || "Something went wrong while generating response.";
 
       setMessages((prev) =>
         prev.map((msg) =>
@@ -157,7 +167,7 @@ export default function ChatView({ sessionId }: Props) {
             ? {
                 ...msg,
 
-                content: "Something went wrong while generating response.",
+                content: detail,
               }
             : msg,
         ),

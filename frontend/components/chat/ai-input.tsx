@@ -31,6 +31,22 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { SpeechInput } from "./speech-input";
+import { toast } from "sonner";
+
+// Types accepted end-to-end: parsed to text (docs) or read via vision (images).
+const ACCEPTED_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  "text/csv",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/webp",
+];
+
+const ACCEPT_ATTR = ".pdf,.docx,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp";
 
 export const title = "AI with Voice";
 interface Props {
@@ -103,14 +119,17 @@ const AiInput = ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error);
+        throw new Error(data.error || "Failed to create chat");
       }
 
+      setMessage("");
+      setFiles([]);
       router.push(
         `/chat/${data.sessionId}?message=${encodeURIComponent(message)}`,
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      toast.error(error?.message || "Failed to create chat");
     } finally {
       setLoading(false);
     }
@@ -125,13 +144,30 @@ const AiInput = ({
         type="file"
         hidden
         multiple
-        accept=".pdf,.docx,.xlsx,.txt,.csv,.png,.jpeg,.webp,.mp3,.wav,.mp4,.avi,.mov,.wmv"
+        accept={ACCEPT_ATTR}
         onChange={(e) => {
           const selectedFiles = Array.from(e.target.files || []);
+          e.target.value = "";
 
-          if (selectedFiles.length > 0) {
-            setFiles((prev) => [...prev, ...selectedFiles]);
-            e.target.value = "";
+          if (selectedFiles.length === 0) return;
+
+          const accepted = selectedFiles.filter((f) =>
+            ACCEPTED_TYPES.includes(f.type),
+          );
+          const rejected = selectedFiles.filter(
+            (f) => !ACCEPTED_TYPES.includes(f.type),
+          );
+
+          if (rejected.length > 0) {
+            toast.error(
+              `Unsupported file type: ${rejected
+                .map((f) => f.name)
+                .join(", ")}. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP.`,
+            );
+          }
+
+          if (accepted.length > 0) {
+            setFiles((prev) => [...prev, ...accepted]);
           }
         }}
       />

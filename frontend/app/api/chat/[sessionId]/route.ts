@@ -3,13 +3,12 @@ import { NextResponse } from "next/server";
 import { sessionVectorStores } from "@/lib/rag/store";
 
 import { retrieveContext } from "@/lib/rag/retrieval";
-import { model } from "@/lib/rag/model";
 import { streamNormalChat } from "@/lib/rag/stream-normal";
 import { streamAnswer } from "@/lib/rag/stream";
-import { validateFile } from "@/lib/uploads/validate-file";
-import { saveFile } from "@/lib/uploads/save-file";
-import { parseDocument } from "@/lib/loader/index";
-import { ingestDocument } from "@/lib/rag/ingestion";
+import { processFile } from "@/lib/uploads/process-file";
+
+// Vision/OCR + embedding on the free tier can take a while.
+export const maxDuration = 120;
 
 interface Props {
   params: Promise<{
@@ -25,7 +24,7 @@ export async function POST(req: Request, { params }: Props) {
     let files: File[] = [];
 
     const contentType = req.headers.get("content-type") || "";
-    
+
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
       message = (formData.get("message") as string) || "";
@@ -39,16 +38,7 @@ export async function POST(req: Request, { params }: Props) {
     // If files were uploaded, process them into the session's vector store
     if (files.length > 0) {
       for (const file of files) {
-        validateFile(file);
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const saved = await saveFile(file, buffer);
-        const parsed = await parseDocument(buffer, file.type);
-        const ingestion = await ingestDocument({
-          text: parsed.text,
-          fileName: file.name,
-          filePath: saved.filepath,
-        });
+        const { ingestion } = await processFile(file);
 
         // Merge into existing vector store or create new one
         const existingStore = sessionVectorStores.get(sessionId);

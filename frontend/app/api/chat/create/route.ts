@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { createSession } from "@/lib/chat/create-session";
-import { validateFile } from "@/lib/uploads/validate-file";
-import { saveFile } from "@/lib/uploads/save-file";
-import { parseDocument } from "@/lib/loader/index";
-import { ingestDocument } from "@/lib/rag/ingestion";
+import { processFile } from "@/lib/uploads/process-file";
 import { sessionVectorStores } from "@/lib/rag/store";
+
+// Vision/OCR + embedding on the free tier can take a while.
+export const maxDuration = 120;
 
 export async function POST(req: Request) {
   try {
@@ -21,30 +21,12 @@ export async function POST(req: Request) {
     let document = null;
 
     // if file uploaded
-    if (file) {
-      validateFile(file);
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+    if (file && file.size > 0) {
+      const result = await processFile(file);
 
-      // save
-      const saved = await saveFile(file, buffer);
-      // parse
-      const parsed = await parseDocument(buffer, file.type);
-      // ingest into RAG
-      const ingestion = await ingestDocument({
-        text: parsed.text,
-        fileName: file.name,
-        filePath: saved.filepath,
-      });
+      sessionVectorStores.set(session.id, result.ingestion.vectorStore);
 
-      sessionVectorStores.set(session.id, ingestion.vectorStore);
-
-      document = {
-        name: file.name,
-        type: file.type,
-        textLength: parsed.text.length,
-        chunks: ingestion.chunks.length,
-      };
+      document = result.document;
     }
 
     return NextResponse.json({

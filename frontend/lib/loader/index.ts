@@ -15,6 +15,7 @@ export async function parseDocument(buffer: Buffer, mimeType: string) {
       return parseExcel(buffer);
 
     case "text/plain":
+    case "text/csv":
       return parseText(buffer);
 
     default:
