@@ -1,12 +1,11 @@
-import React from "react";
 import {
   Sparkles,
   X,
   ChevronDown,
   ArrowUpRight,
   BarChart3,
-  PieChart,
-  Home,
+  FileText,
+  BookOpen,
   MoreVertical,
   Bot,
   BotIcon,
@@ -14,8 +13,9 @@ import {
 import { HeroGradient } from "./hero-gradient";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
+import Link from "next/link";
 
-const heroSection = () => {
+const HeroSection = () => {
   return (
     <main className="relative z-10 mx-auto flex flex-col items-center overflow-hidden rounded-2xl pt-[180px] pb-32">
       <HeroGradient />
@@ -26,32 +26,38 @@ const heroSection = () => {
       {/* Hero Headline */}
       <div className="relative z-20 mx-auto mb-12 max-w-6xl space-y-6 text-center">
         <h1 className="bg-linear-to-b from-neutral-900 to-neutral-500 bg-clip-text text-5xl font-bold tracking-tight text-transparent md:text-6xl lg:text-7xl">
-          Chat with your document <br className="hidden md:block" /> using AI
+          Chat with your documents <br className="hidden md:block" /> using AI
         </h1>
         <p className="mx-auto max-w-2xl text-base leading-relaxed font-medium text-[#64748b] md:text-xl">
-          Upload PDFs,cdocs or notes and get instant, context-aware answers in
-          seconds pusing Ai-powered sementic search.
+          Upload PDFs, docs or notes and get instant, context-aware answers in
+          seconds using AI-powered semantic search.
         </p>
       </div>
 
       {/* Central Interactive Graphic */}
-      <CenteralIntractiveGraphics />
+      <CentralInteractiveGraphic />
       {/* Call To Action */}
       <div className="relative z-30 mt-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
-        <button className="w-full rounded-full bg-[#1e293b] px-8 py-3.5 text-sm font-semibold tracking-wide text-white shadow-xl shadow-slate-200/50 transition-all duration-200 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-300 sm:w-auto">
+        <Link
+          href="/signup"
+          className="w-full rounded-full bg-[#1e293b] px-8 py-3.5 text-sm font-semibold tracking-wide text-white shadow-xl shadow-slate-200/50 transition-all duration-200 hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-300 sm:w-auto"
+        >
           Try for free
-        </button>
-        <button className="w-full rounded-full border border-gray-200 bg-white px-8 py-3.5 text-sm font-semibold tracking-wide text-[#1e293b] shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md sm:w-auto">
-          Request a Demo
-        </button>
+        </Link>
+        <Link
+          href="/login"
+          className="w-full rounded-full border border-gray-200 bg-white px-8 py-3.5 text-sm font-semibold tracking-wide text-[#1e293b] shadow-sm transition-all duration-200 hover:bg-gray-50 hover:shadow-md sm:w-auto"
+        >
+          See it in action
+        </Link>
       </div>
     </main>
   );
 };
 
-export default heroSection;
+export default HeroSection;
 
-const CenteralIntractiveGraphics = () => {
+const CentralInteractiveGraphic = () => {
   return (
     <div className="relative mx-auto mt-6 flex h-auto min-h-[460px] w-full max-w-4xl items-center justify-center">
       {/* Main Chat Interface Window */}
@@ -76,7 +82,6 @@ const CenteralIntractiveGraphics = () => {
               height={50}
               className="rounded-full p-1"
             />
-
             <div className="absolute inset-0 rounded-full bg-orange-400 opacity-20 blur-xl"></div>
           </div>
         </div>
@@ -84,11 +89,11 @@ const CenteralIntractiveGraphics = () => {
         {/* Chat Thread */}
         <div className="mb-20 space-y-4 text-[13px]">
           <div className="max-w-[90%] rounded-[20px] rounded-tl-sm border border-gray-100 bg-[#f8fafc] p-4 leading-relaxed text-gray-600 shadow-sm">
-            Provide a detailed summary of my company's latest investment
-            including key metrics.
+            Summarize the key findings from my research paper on climate change
+            and highlight the most important data points.
           </div>
           <div className="ml-auto max-w-[85%] self-end rounded-[20px] rounded-tr-sm border border-gray-100 bg-white p-4 leading-relaxed text-gray-600 shadow-sm transition-all hover:shadow-md">
-            What are the key performance trends for my company this quarter?
+            What are the main conclusions in my Q4 financial report?
           </div>
         </div>
 
@@ -101,7 +106,7 @@ const CenteralIntractiveGraphics = () => {
               </div>
               <input
                 type="text"
-                placeholder="Ask or search for anything"
+                placeholder="Ask about your documents..."
                 className="flex-1 cursor-pointer bg-transparent text-[13px] font-medium whitespace-nowrap text-gray-700 placeholder-gray-400 outline-none"
               />
               <div className="ml-2 shrink-0 rounded-full border border-gray-200 p-1 text-gray-400 transition-colors hover:bg-gray-50">
@@ -116,64 +121,64 @@ const CenteralIntractiveGraphics = () => {
 
       {/* Left Column Data Components */}
       <div className="absolute top-[2%] left-[2%] z-10 hidden w-[240px] lg:block xl:left-[8%]">
-        {/* Stat Pill 1 */}
+        {/* Stat Pill 1 - Documents Indexed */}
         <div className="group absolute top-8 left-4 z-20 flex w-[230px] -rotate-[3deg] transform cursor-default items-center gap-3 rounded-[20px] border border-gray-50 bg-white p-3 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:rotate-0">
           <div className="shrink-0 rounded-full bg-orange-50 p-2.5 transition-colors group-hover:bg-orange-100">
-            <PieChart className="h-5 w-5 text-orange-400" strokeWidth={2.5} />
+            <FileText className="h-5 w-5 text-orange-400" strokeWidth={2.5} />
           </div>
           <div className="flex-1">
             <div className="text-lg leading-tight font-[800] text-gray-800">
-              48%
+              1.2k
             </div>
             <div className="mt-0.5 text-[10px] leading-tight font-medium text-gray-500">
-              The Best Deals for this year!
+              Documents indexed
             </div>
           </div>
           <MoreVertical className="absolute top-2.5 right-1.5 h-4 w-4 text-gray-300" />
         </div>
 
-        {/* Stat Pill 2 */}
+        {/* Stat Pill 2 - Search Accuracy */}
         <div className="group absolute top-[80px] left-8 z-10 flex w-[230px] rotate-2 transform cursor-default items-center gap-3 rounded-[20px] border border-gray-50 bg-white p-3 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:rotate-0">
           <div className="shrink-0 rounded-full bg-purple-50 p-2.5 transition-colors group-hover:bg-purple-100">
-            <Home className="h-5 w-5 text-purple-500" strokeWidth={2.5} />
+            <BookOpen className="h-5 w-5 text-purple-500" strokeWidth={2.5} />
           </div>
           <div className="flex-1">
             <div className="text-lg leading-tight font-[800] text-gray-800">
-              68%
+              94%
             </div>
             <div className="mt-0.5 text-[10px] leading-tight font-medium text-gray-500">
-              in this year's art race
+              Search accuracy rate
             </div>
           </div>
           <MoreVertical className="absolute top-2.5 right-1.5 h-4 w-4 text-gray-300" />
         </div>
       </div>
 
-      {/* Bottom Left Sales Card */}
+      {/* Bottom Left - Chunks Processed Card */}
       <div className="absolute bottom-[-4%] left-[6%] z-30 hidden w-[190px] -rotate-[4deg] transform rounded-3xl border border-gray-50 bg-white p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-2 hover:rotate-0 lg:block xl:left-[12%]">
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#6366f1] text-white shadow-lg shadow-indigo-200/50">
           <BarChart3 className="h-6 w-6" strokeWidth={2.5} />
         </div>
         <div className="mb-1.5 flex items-center gap-2">
-          <span className="text-sm font-extrabold text-gray-800">Sales</span>
+          <span className="text-sm font-extrabold text-gray-800">Chunks</span>
           <span className="flex items-center rounded bg-emerald-50 px-1 py-0.5 text-[10px] font-bold tracking-wide text-emerald-600">
-            +5.9% <ArrowUpRight className="ml-[1px] h-3 w-3" />
+            +12.4% <ArrowUpRight className="ml-[1px] h-3 w-3" />
           </span>
         </div>
         <div className="mb-1 text-[22px] font-[800] text-gray-900">
-          $7,854.21
+          48,291
         </div>
         <div className="text-[10px] font-medium text-gray-400">
-          Previous year ($2,134.01)
+          Processed this month
         </div>
       </div>
 
       {/* Right Column Data Components */}
 
-      {/* Top Right Chart Card */}
+      {/* Top Right - Documents by Type */}
       <div className="absolute top-[5%] right-[2%] z-10 hidden w-[200px] rotate-[5deg] transform rounded-3xl border border-gray-50 bg-white p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-2 hover:rotate-0 lg:block xl:right-[8%]">
         <div className="mb-4 flex items-center justify-between">
-          <span className="text-xs font-bold text-gray-700">Sales Figures</span>
+          <span className="text-xs font-bold text-gray-700">Documents by Type</span>
           <div className="flex gap-0.5">
             <div className="h-1 w-1 rounded-full bg-gray-300"></div>
             <div className="h-1 w-1 rounded-full bg-gray-300"></div>
@@ -183,26 +188,26 @@ const CenteralIntractiveGraphics = () => {
         <div className="mb-4 flex items-center gap-2">
           <div className="h-3 w-3 rounded-md bg-orange-400 shadow-sm shadow-orange-200"></div>
           <div className="text-xl font-[800] tracking-tight text-gray-900">
-            $4,686.82
+            342 PDFs
           </div>
         </div>
         <div className="mb-3 text-[10px] font-medium text-gray-400">
-          Upcoming Sales
+          Most uploaded format
         </div>
         <div className="flex h-12 items-end gap-[6px]">
-          <div className="h-[40%] w-full rounded bg-orange-100 transition-colors hover:bg-orange-200"></div>
-          <div className="h-[60%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
-          <div className="h-[30%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
-          <div className="h-[100%] w-full rounded bg-orange-400 shadow-sm transition-colors hover:bg-orange-500"></div>
-          <div className="h-[70%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
+          <div className="h-[80%] w-full rounded bg-orange-400 shadow-sm transition-colors hover:bg-orange-500"></div>
+          <div className="h-[50%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
+          <div className="h-[35%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
+          <div className="h-[65%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
+          <div className="h-[45%] w-full rounded bg-gray-100 transition-colors hover:bg-gray-200"></div>
         </div>
       </div>
 
-      {/* Bottom Right Performance Card */}
+      {/* Bottom Right - Retrieval Performance Card */}
       <div className="absolute right-[0%] bottom-[-1%] z-30 hidden w-[220px] rotate-[2deg] transform rounded-3xl border border-gray-50 bg-white p-5 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-2 hover:rotate-0 lg:block xl:right-[6%]">
         <div className="mb-3 flex items-center justify-between">
           <span className="text-[11px] font-bold text-gray-700">
-            Average Total Sales
+            Retrieval Performance
           </span>
           <div className="flex gap-[3px]">
             <div className="h-1 w-1 rounded-full bg-gray-300"></div>
@@ -240,7 +245,7 @@ const CenteralIntractiveGraphics = () => {
               88%
             </span>
             <span className="mt-0.5 w-12 text-center text-[7px] leading-[1.2] font-bold tracking-tight text-purple-500 uppercase">
-              Target Reached SV
+              Relevance Score
             </span>
           </div>
         </div>
@@ -249,16 +254,16 @@ const CenteralIntractiveGraphics = () => {
         <div className="flex justify-between border-t border-gray-100 pt-3">
           <div className="flex flex-col">
             <span className="mb-0.5 text-[9px] font-semibold text-gray-400">
-              Average Sales
+              Avg Response
             </span>
-            <span className="text-xs font-[800] text-gray-800">$4,277.86</span>
+            <span className="text-xs font-[800] text-gray-800">1.2s</span>
           </div>
           <div className="w-px bg-gray-100"></div>
           <div className="flex flex-col text-right">
             <span className="mb-0.5 text-[9px] font-semibold text-gray-400">
-              Average Products
+              Sources Found
             </span>
-            <span className="text-xs font-[800] text-gray-800">$2,572.75</span>
+            <span className="text-xs font-[800] text-gray-800">4.8/session</span>
           </div>
         </div>
       </div>
