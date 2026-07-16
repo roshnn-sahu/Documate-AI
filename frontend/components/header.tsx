@@ -1,12 +1,9 @@
 "use client";
-import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const Header = () => {
-  const router = useRouter();
   return (
     <>
       <nav className="fixed top-6 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 px-4">
@@ -52,13 +49,11 @@ const Header = () => {
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              onClick={() => {
-                router.push("/chat/new");
-              }}
-              variant="outline"
-            >
-              Get Started
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/login">Log in</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/signup">Sign up</Link>
             </Button>
           </div>
         </div>
