@@ -1,35 +1,26 @@
 import { chunkDocument } from "./chunking";
-
-import { createVectorStore } from "./vector-store";
+import { addChunks, type Scope } from "./vector-store";
 
 interface IngestOptions {
   text: string;
-
   fileName?: string;
-
   filePath?: string;
+  scope?: Scope;
 }
 
 export async function ingestDocument({
   text,
   fileName,
   filePath,
+  scope,
 }: IngestOptions) {
   // split into chunks
-  const chunks = await chunkDocument({
-    text,
+  const chunks = await chunkDocument({ text, fileName, filePath });
 
-    fileName,
+  // persist to Supabase (scoped to user + session)
+  if (scope) {
+    await addChunks(chunks, scope);
+  }
 
-    filePath,
-  });
-
-  // create vector DB
-  const vectorStore = await createVectorStore(chunks);
-
-  return {
-    chunks,
-
-    vectorStore,
-  };
+  return { chunks };
 }

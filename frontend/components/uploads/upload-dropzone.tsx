@@ -93,24 +93,43 @@ export default function UploadDropzone() {
     setFiles((prev) => prev.filter((f) => f.id !== id));
   }, []);
 
-  const simulateProcessing = useCallback(
-    async (uploadedFile: UploadedFile) => {
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.id === uploadedFile.id ? { ...f, status: "processing" } : f,
-        ),
-      );
+  // Real upload: POST to /api/uploads per file
+  const uploadFile = useCallback(async (uploadedFile: UploadedFile) => {
+    setFiles((prev) =>
+      prev.map((f) =>
+        f.id === uploadedFile.id ? { ...f, status: "processing" } : f,
+      ),
+    );
 
-      await new Promise((r) => setTimeout(r, 1000 + Math.random() * 1500));
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadedFile.file);
+
+      const res = await fetch("/api/uploads", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || `Upload failed (${res.status})`);
+      }
 
       setFiles((prev) =>
         prev.map((f) =>
           f.id === uploadedFile.id ? { ...f, status: "ready" } : f,
         ),
       );
-    },
-    [],
-  );
+    } catch (err: any) {
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === uploadedFile.id
+            ? { ...f, status: "error", error: err.message || "Upload failed" }
+            : f,
+        ),
+      );
+    }
+  }, []);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -144,11 +163,11 @@ export default function UploadDropzone() {
 
       for (const uploadedFile of newFiles) {
         if (uploadedFile.status !== "error") {
-          await simulateProcessing(uploadedFile);
+          await uploadFile(uploadedFile);
         }
       }
     },
-    [simulateProcessing],
+    [uploadFile],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
