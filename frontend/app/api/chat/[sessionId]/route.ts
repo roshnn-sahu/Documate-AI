@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { sessionVectorStores } from "@/lib/rag/store";
-
 import { retrieveContext } from "@/lib/rag/retrieval";
 import { streamNormalChat } from "@/lib/rag/stream-normal";
 import { streamAnswer } from "@/lib/rag/stream";
 import { processFile } from "@/lib/uploads/process-file";
+import { createClient } from "@/lib/supabase/server";
 
 // Vision/OCR + embedding on the free tier can take a while.
 export const maxDuration = 120;
@@ -15,11 +14,32 @@ interface Props {
     sessionId: string;
   }>;
 }
+
 export async function POST(req: Request, { params }: Props) {
   try {
     const { sessionId } = await params;
 
-    // Support both FormData (with files) and JSON (text only)
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Verify the session belongs to this user.
+    const { data: session } = await supabase
+      .from("chat_sessions")
+      .select("id, title")
+      .eq("id", sessionId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!session) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+
+    // Support both FormData (with files) and JSON (text only).
     let message: string;
     let files: File[] = [];
 
@@ -35,48 +55,46 @@ export async function POST(req: Request, { params }: Props) {
       message = body.message || "";
     }
 
-    // If files were uploaded, process them into the session's vector store
-    if (files.length > 0) {
-      for (const file of files) {
-        const { ingestion } = await processFile(file);
-
-        // Merge into existing vector store or create new one
-        const existingStore = sessionVectorStores.get(sessionId);
-        if (existingStore) {
-          // Add documents to existing store
-          await existingStore.addDocuments(ingestion.chunks);
-        } else {
-          sessionVectorStores.set(sessionId, ingestion.vectorStore);
-        }
-      }
+    // Ingest any uploaded files into this session's vector store.
+    for (const file of files) {
+      await processFile(file, { userId: user.id, sessionId });
     }
 
-    const vectorStore = sessionVectorStores.get(sessionId);
-
-    let stream;
-    let sources: any[] = [];
-
-    if (vectorStore) {
-      const docs = await retrieveContext(vectorStore, message);
-      sources = docs.map((doc: any) => ({
-        content: doc.pageContent,
-        metadata: doc.metadata,
-      }));
-
-      stream = await streamAnswer(docs, message);
-    } else {
-      // No documents uploaded — plain chat via streamNormalChat
-      stream = await streamNormalChat(message);
+    // Persist the user message.
+    if (message.trim()) {
+      await supabase.from("chat_messages").insert({
+        session_id: sessionId,
+        user_id: user.id,
+        role: "user",
+        content: message,
+      });
     }
+
+    // Retrieve context scoped to this user + session.
+    const docs = await retrieveContext(message, {
+      userId: user.id,
+      sessionId,
+    });
+
+    const sources = docs.map((doc: any) => ({
+      content: doc.pageContent,
+      metadata: doc.metadata,
+    }));
+
+    const stream =
+      docs.length > 0
+        ? await streamAnswer(docs, message)
+        : await streamNormalChat(message);
 
     const encoder = new TextEncoder();
 
     const readableStream = new ReadableStream({
       async start(controller) {
+        let assistantText = "";
         for await (const chunk of stream) {
           const token = chunk.content;
 
-          // Handle both string and array content formats from LangChain
+          // Handle both string and array content formats from LangChain.
           const text =
             typeof token === "string"
               ? token
@@ -85,7 +103,33 @@ export async function POST(req: Request, { params }: Props) {
                   .map((block: any) => block.text)
                   .join("");
 
+          assistantText += text;
           controller.enqueue(encoder.encode(text));
+        }
+
+        // Persist the assistant reply + bump the session (best-effort).
+        try {
+          await supabase.from("chat_messages").insert({
+            session_id: sessionId,
+            user_id: user.id,
+            role: "assistant",
+            content: assistantText,
+            sources,
+          });
+
+          const update: Record<string, any> = {
+            updated_at: new Date().toISOString(),
+          };
+          if (!session.title || session.title === "New chat") {
+            update.title = message.slice(0, 60) || "New chat";
+          }
+          await supabase
+            .from("chat_sessions")
+            .update(update)
+            .eq("id", sessionId);
+        } catch {
+          // Streaming already succeeded — don't fail the response on a
+          // persistence hiccup.
         }
 
         controller.close();
@@ -101,12 +145,8 @@ export async function POST(req: Request, { params }: Props) {
     });
   } catch (error: any) {
     return NextResponse.json(
-      {
-        error: error.message || "Chat failed",
-      },
-      {
-        status: 500,
-      },
+      { error: error.message || "Chat failed" },
+      { status: 500 },
     );
   }
 }

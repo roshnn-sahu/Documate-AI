@@ -23,10 +23,11 @@ import { LoaderOne } from "../ui/loader";
 
 interface Props {
   sessionId: string;
+  initialMessages?: ChatMessage[];
 }
 
-export default function ChatView({ sessionId }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export default function ChatView({ sessionId, initialMessages = [] }: Props) {
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
 
   const [loading, setLoading] = useState(false);
   const [toolLoading, setToolLoading] = useState(false);
@@ -221,6 +222,11 @@ export default function ChatView({ sessionId }: Props) {
 
   useEffect(() => {
     if (initialMessageSent.current) return;
+    // Don't auto-send if we already have persisted messages
+    if (initialMessages.length > 0) {
+      initialMessageSent.current = true;
+      return;
+    }
 
     const params = new URLSearchParams(window.location.search);
     const initialMsg = params.get("message");

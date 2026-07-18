@@ -65,15 +65,28 @@ import Image from "next/image";
 
 // Fixed syntax error and added ToolProvider support
 
-export function ChatSidebar({ children }) {
+export function ChatSidebar({ children, user, sessions = [] }) {
   const router = useRouter();
   const { runTool } = useTool();
 
+  const handleLogout = async () => {
+    await fetch("/auth/signout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  };
+
+  const initials = (user?.name || "U")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   const data = {
     user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
+      name: user?.name || "User",
+      email: user?.email || "",
+      avatar: user?.avatar || "/placeholder.svg",
     },
     company: {
       name: "Documate AI",
@@ -100,22 +113,27 @@ export function ChatSidebar({ children }) {
           {
             title: "Summarize",
             url: "/workspace/summrize",
+            tool: "summary",
           },
           {
             title: "Flashcards",
             url: "/workspace/flashcards",
+            tool: "flashcards",
           },
           {
             title: "Notes",
             url: "/workspace/notes",
+            tool: "notes",
           },
           {
             title: "Quiz",
             url: "/workspace/quiz",
+            tool: "quiz",
           },
           {
             title: "Insights",
             url: "/workspace/insights",
+            tool: "insights",
           },
         ],
       },
@@ -234,7 +252,7 @@ export function ChatSidebar({ children }) {
                         {item?.items?.map((subItem) => (
                           <SidebarMenuSubItem
                             key={subItem.title}
-                            onClick={() => runTool(subItem.url)}
+                            onClick={() => router.push(subItem.url)}
                           >
                             <SidebarMenuSubButton asChild>
                               <span className="cursor-pointer">
@@ -256,16 +274,26 @@ export function ChatSidebar({ children }) {
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>History</SidebarGroupLabel>
             <SidebarMenu>
-              {data.projects.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      {item.icon}
-                      {item.name}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {sessions.length === 0 ? (
+                <p className="text-muted-foreground px-2 py-1 text-xs">
+                  No chats yet
+                </p>
+              ) : (
+                sessions.map((s) => (
+                  <SidebarMenuItem key={s.id}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={s.title}
+                      className="cursor-pointer"
+                    >
+                      <span onClick={() => router.push(`/chat/${s.id}`)}>
+                        <BotIcon />
+                        <span className="truncate">{s.title}</span>
+                      </span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
@@ -286,7 +314,9 @@ export function ChatSidebar({ children }) {
                         src={data.user.avatar || "/placeholder.svg"}
                         alt={data.user.name}
                       />
-                      <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">
+                        {initials}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-medium">
@@ -328,7 +358,9 @@ export function ChatSidebar({ children }) {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>Log out</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                    Log out
+                  </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -389,7 +421,9 @@ export function ChatSidebar({ children }) {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>Log out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Log out
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
