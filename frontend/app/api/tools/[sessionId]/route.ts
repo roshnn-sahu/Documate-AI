@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { sessionVectorStores } from "@/lib/rag/store";
 import { retrieveContext } from "@/lib/rag/retrieval";
 import { executeAITool } from "@/lib/rag/tool-executor";
+import { createClient } from "@/lib/supabase/server";
 
 interface Props {
   params: Promise<{
@@ -12,25 +12,37 @@ interface Props {
 export async function POST(req: Request, { params }: Props) {
   try {
     const { sessionId } = await params;
-    const { tool, input } = await req.json();
 
-    const vectorStore = sessionVectorStores.get(sessionId);
-
-    if (!vectorStore) {
-      return NextResponse.json(
-        {
-          error: "Session not found",
-        },
-        {
-          status: 404,
-        },
-      );
+    // Auth check
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // retrieve docs
-    const docs = await retrieveContext(vectorStore, input || "document");
+    // Verify session ownership
+    const { data: session } = await supabase
+      .from("chat_sessions")
+      .select("id")
+      .eq("id", sessionId)
+      .eq("user_id", user.id)
+      .single();
 
-    // execute AI tool
+    if (!session) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+
+    const { tool, input } = await req.json();
+
+    // Retrieve docs scoped to this user + session
+    const docs = await retrieveContext(input || "document", {
+      userId: user.id,
+      sessionId,
+    });
+
+    // Execute AI tool
     const stream = await executeAITool({
       tool,
       docs,
@@ -62,18 +74,13 @@ export async function POST(req: Request, { params }: Props) {
     return new Response(readableStream, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-
         "Transfer-Encoding": "chunked",
       },
     });
   } catch (error: any) {
     return NextResponse.json(
-      {
-        error: error.message || "Tool failed",
-      },
-      {
-        status: 500,
-      },
+      { error: error.message || "Tool failed" },
+      { status: 500 },
     );
   }
 }

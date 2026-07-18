@@ -1,53 +1,95 @@
 import { NextResponse } from "next/server";
-import path from "path";
-import fs from "fs/promises";
-import {PDFParse} from "pdf-parse";
-import { v4 as uuid } from "uuid";
+import { createClient } from "@/lib/supabase/server";
+import { processFile } from "@/lib/uploads/process-file";
+
+// Vision/OCR + embedding on the free tier can take a while.
+export const maxDuration = 120;
 
 export async function POST(req: Request) {
   try {
-    const data = await req.formData();
-
-    const file = data.get("file") as File;
-
-    if (!file) {
-      return NextResponse.json(
-        { error: "No file uploaded" },
-        { status: 400 }
-      );
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const data = await req.formData();
+    const file = data.get("file") as File | null;
 
-    // unique filename
-    const fileName = `${uuid()}-${file.name}`;
+    if (!file || file.size === 0) {
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    }
 
-    // upload path
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    // Create a session for this upload
+    const { data: session, error: sessionError } = await supabase
+      .from("chat_sessions")
+      .insert({ user_id: user.id, title: file.name })
+      .select("id")
+      .single();
 
-    await fs.mkdir(uploadDir, { recursive: true });
+    if (sessionError || !session) {
+      throw new Error(sessionError?.message || "Failed to create session");
+    }
 
-    const filePath = path.join(uploadDir, fileName);
+    // Create a placeholder document row first so chunks get document_id in metadata
+    const { data: doc, error: docError } = await supabase
+      .from("documents")
+      .insert({
+        user_id: user.id,
+        session_id: session.id,
+        file_name: file.name,
+        mime_type: file.type,
+        size_bytes: file.size,
+        chunk_count: 0,
+      })
+      .select("id")
+      .single();
 
-    // save file
-    await fs.writeFile(filePath, buffer);
+    if (docError || !doc) {
+      throw new Error(docError?.message || "Failed to create document row");
+    }
 
-    // parse pdf
-    const parser = new PDFParse({ data: buffer });
-    const pdfData = await parser.getText();
+    // Process file (validates, saves, extracts text, ingests into vector store)
+    const result = await processFile(file, {
+      userId: user.id,
+      sessionId: session.id,
+      documentId: doc.id,
+    });
+
+    // Update document with processing results
+    const { error: updateError } = await supabase
+      .from("documents")
+      .update({
+        cloudinary_url: result.cloudinaryUrl,
+        cloudinary_public_id: result.cloudinaryPublicId,
+        extracted_text: result.text,
+        chunk_count: result.chunks.length,
+      })
+      .eq("id", doc.id);
+
+    if (updateError) {
+      console.error("Failed to update document:", updateError);
+    }
+
+    if (docError) {
+      console.error("Failed to insert document:", docError);
+    }
 
     return NextResponse.json({
       success: true,
-      fileName,
-      text: pdfData.text.slice(0, 1000),
+      id: doc?.id || session.id,
+      sessionId: session.id,
+      name: file.name,
+      cloudinary_url: result.cloudinaryUrl,
+      chunk_count: result.chunks.length,
     });
-  } catch (error) {
-    console.error(error);
-
+  } catch (error: any) {
+    console.error("Upload failed:", error);
     return NextResponse.json(
-      { error: "Upload failed" },
-      { status: 500 }
+      { error: error.message || "Upload failed" },
+      { status: 500 },
     );
   }
 }
