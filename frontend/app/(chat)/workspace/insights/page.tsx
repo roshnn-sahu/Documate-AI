@@ -3,404 +3,265 @@
 import React, { useState } from "react";
 import {
   Lightbulb,
-  TrendingUp,
-  TrendingDown,
-  Users,
-  FileText,
-  Search,
-  Clock,
-  ArrowUpRight,
-  ArrowDownRight,
-  Download,
-  Filter,
-  LayoutDashboard,
+  Sparkles,
+  Loader2,
+  Copy,
+  CheckCheck,
   BarChart3,
-  Hash,
+  Target,
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { SessionPicker } from "@/components/workspace/session-picker";
+import { runAITool } from "@/lib/client/run-ai-tools";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface StatCard {
-  label: string;
-  value: string;
-  change: string;
-  trend: "up" | "down";
-  icon: React.ElementType;
-  color: string;
-  bg: string;
+// Parse markdown insights into structured items
+function parseInsights(markdown: string): { title: string; body: string }[] {
+  const insights: { title: string; body: string }[] = [];
+  const blocks = markdown.split(/\n(?=##\s+)/);
+
+  for (const block of blocks) {
+    const titleMatch = block.match(/^##\s+(.+)/);
+    if (titleMatch) {
+      const title = titleMatch[1].replace(/[*_]/g, "").trim();
+      const body = block
+        .replace(/^##\s+.+\n?/, "")
+        .replace(/^[-*]\s+/gm, "")
+        .trim();
+      if (title && body) {
+        insights.push({ title, body });
+      }
+    }
+  }
+  return insights;
 }
 
-const stats: StatCard[] = [
-  {
-    label: "Total Documents",
-    value: "1,247",
-    change: "+12.5%",
-    trend: "up",
-    icon: FileText,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-  },
-  {
-    label: "Queries Processed",
-    value: "8,932",
-    change: "+23.1%",
-    trend: "up",
-    icon: Search,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-  },
-  {
-    label: "Avg Response Time",
-    value: "1.2s",
-    change: "-8.3%",
-    trend: "down",
-    icon: Clock,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-  },
-  {
-    label: "Active Users",
-    value: "342",
-    change: "+18.7%",
-    trend: "up",
-    icon: Users,
-    color: "text-rose-600",
-    bg: "bg-rose-50",
-  },
-];
-
-const weeklyActivity = [
-  { day: "Mon", queries: 120, documents: 8 },
-  { day: "Tue", queries: 245, documents: 12 },
-  { day: "Wed", queries: 189, documents: 15 },
-  { day: "Thu", queries: 312, documents: 20 },
-  { day: "Fri", queries: 278, documents: 18 },
-  { day: "Sat", queries: 156, documents: 5 },
-  { day: "Sun", queries: 98, documents: 3 },
-];
-
-const topTopics = [
-  { topic: "Retrieval-Augmented Generation", count: 342, growth: 28 },
-  { topic: "Vector Embeddings", count: 289, growth: 22 },
-  { topic: "Semantic Search", count: 231, growth: 35 },
-  { topic: "Document Chunking", count: 198, growth: 15 },
-  { topic: "Language Models", count: 167, growth: -5 },
-  { topic: "Text Preprocessing", count: 145, growth: 12 },
-  { topic: "Knowledge Graphs", count: 123, growth: 45 },
-];
-
-const recentInsights = [
-  {
-    title: "Search accuracy improved by 15%",
-    description:
-      "New embedding model shows significant improvement in semantic search relevance scores across all document categories.",
-    impact: "positive",
-    category: "Performance",
-    date: "2 hours ago",
-  },
-  {
-    title: "Most queried topic: RAG implementation",
-    description:
-      "Users are increasingly asking about RAG implementation patterns. Consider creating a dedicated guide.",
-    impact: "info",
-    category: "Trend",
-    date: "5 hours ago",
-  },
-  {
-    title: "Peak usage detected",
-    description:
-      "Highest query volume recorded between 2-4 PM EST. Consider scaling resources during this window.",
-    impact: "neutral",
-    category: "System",
-    date: "1 day ago",
-  },
-  {
-    title: "Document upload rate increasing",
-    description:
-      "Document uploads have grown 32% this week. Storage optimization recommended.",
-    impact: "positive",
-    category: "Growth",
-    date: "2 days ago",
-  },
-];
-
-const maxQuery = Math.max(...weeklyActivity.map((d) => d.queries));
-const maxDoc = Math.max(...weeklyActivity.map((d) => d.documents));
-
 export default function InsightsPage() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<string | null>(null);
+  const [insights, setInsights] = useState<{ title: string; body: string }[]>([]);
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerate = async () => {
+    if (!sessionId) return;
+    setIsGenerating(true);
+    setResult(null);
+    setInsights([]);
+    setError(null);
+
+    try {
+      const body = await runAITool({ sessionId, tool: "insights" });
+      const reader = body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        accumulated += chunk;
+        setResult(accumulated);
+      }
+
+      const parsed = parseInsights(accumulated);
+      if (parsed.length === 0 && accumulated.length > 0) {
+        // Show raw text if no structured insights parsed
+        setInsights([{ title: "Analysis Result", body: accumulated }]);
+      } else {
+        setInsights(parsed);
+      }
+    } catch (err: any) {
+      console.error("Failed to generate insights:", err);
+      setError(err.message || "Failed to generate insights. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!result) return;
+    await navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-rose-50">
             <Lightbulb className="size-5 text-rose-600" />
           </div>
           <div>
-            <h1 className="font-bricolage text-xl font-bold text-neutral-900">
-              Insights
-            </h1>
-            <p className="text-xs text-neutral-500">
-              Analytics and patterns from your documents
-            </p>
+            <h1 className="font-bricolage text-xl font-bold text-neutral-900">Insights</h1>
+            <p className="text-xs text-neutral-500">Discover key patterns and findings from your documents</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button size="xs" variant="ghost">
-            <Filter className="mr-1.5 size-3.5" />
-            Filter
+        {result && (
+          <Button size="xs" variant="ghost" onClick={handleCopy} className="gap-1">
+            {copied ? (
+              <><CheckCheck className="size-3.5 text-emerald-500" /><span className="text-emerald-600">Copied!</span></>
+            ) : (
+              <><Copy className="size-3.5" /> Copy</>
+            )}
           </Button>
-          <Button size="xs" variant="outline">
-            <Download className="mr-1.5 size-3.5" />
-            Export
-          </Button>
-        </div>
+        )}
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-            >
-              <Card size="sm" className="group/card transition-all duration-200 hover:shadow-md">
-                <CardContent className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <p className="text-xs font-medium text-neutral-500">
-                      {stat.label}
-                    </p>
-                    <p className="text-2xl font-bold text-neutral-900">
-                      {stat.value}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      {stat.trend === "up" ? (
-                        <TrendingUp className="size-3 text-emerald-500" />
-                      ) : (
-                        <TrendingDown className="size-3 text-rose-500" />
-                      )}
-                      <span
-                        className={`text-xs font-medium ${
-                          stat.trend === "up"
-                            ? "text-emerald-600"
-                            : "text-rose-600"
-                        }`}
-                      >
-                        {stat.change}
-                      </span>
-                    </div>
-                  </div>
-                  <div className={`flex size-9 items-center justify-center rounded-lg ${stat.bg}`}>
-                    <Icon className={`size-4 ${stat.color}`} />
-                  </div>
+      {/* Session Picker & Generate */}
+      {!result && !isGenerating && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-10">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-rose-50">
+              <Lightbulb className="size-7 text-rose-400" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-bricolage text-lg font-semibold text-neutral-800">Extract Insights</h3>
+              <p className="mt-1 text-sm text-neutral-500">Select a session with documents to discover key insights</p>
+            </div>
+            <SessionPicker selectedSessionId={sessionId} onSelect={setSessionId} />
+            <Button className="bg-(image:--color-theme-gradient) text-white shadow-lg shadow-rose-200/50" onClick={handleGenerate} disabled={!sessionId}>
+              <Sparkles className="mr-2 size-4" />
+              Generate Insights
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Error */}
+      {error && (
+        <Card className="border-red-200 bg-red-50/50">
+          <CardContent className="flex flex-col items-center gap-3 py-8">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-red-100">
+              <XCircle className="size-5 text-red-500" />
+            </div>
+            <div className="text-center">
+              <p className="font-medium text-red-700">Extraction Failed</p>
+              <p className="mt-1 text-sm text-red-600/80">{error}</p>
+            </div>
+            <Button variant="outline" size="sm" className="border-red-200 text-red-700 hover:bg-red-100" onClick={() => setError(null)}>
+              Dismiss
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Loading */}
+      {isGenerating && !result && (
+        <>
+          <Card>
+            <CardContent className="flex flex-col items-center gap-4 py-16">
+              <Loader2 className="size-8 animate-spin text-rose-400" />
+              <div className="text-center">
+                <p className="font-medium text-neutral-700">Extracting insights...</p>
+                <p className="mt-0.5 text-xs text-neutral-400">AI is analyzing patterns in your documents</p>
+              </div>
+            </CardContent>
+          </Card>
+          {/* Skeleton insight cards */}
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-l-4 border-l-neutral-200 border-dashed">
+              <CardContent className="space-y-3 p-5">
+                <Skeleton className="h-5 w-1/3" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-4/5" />
+              </CardContent>
+            </Card>
+          ))}
+        </>
+      )}
+
+      {/* Results */}
+      {result && (
+        <div className="space-y-4">
+          {/* Stats */}
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="gap-1.5">
+              <Target className="size-3" />
+              {insights.length} insights found
+            </Badge>
+            <Badge variant="outline" className="gap-1.5">
+              <BarChart3 className="size-3" />
+              {result.split(/\s+/).filter(Boolean).length} words
+            </Badge>
+          </div>
+
+          {/* Insight Cards */}
+          <AnimatePresence>
+            {insights.length > 0 ? (
+              insights.map((insight, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="border-l-4 border-l-rose-400">
+                    <CardContent className="p-5">
+                      <h3 className="font-bricolage text-base font-semibold text-neutral-900">{insight.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-600">{insight.body}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))
+            ) : (
+              <Card>
+                <CardContent className="p-6">
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">{result}</div>
                 </CardContent>
               </Card>
-            </motion.div>
-          );
-        })}
-      </div>
+            )}
+          </AnimatePresence>
 
-      {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          {[
-            { label: "Overview", value: "overview", icon: LayoutDashboard },
-            { label: "Activity", value: "activity", icon: BarChart3 },
-            { label: "Topics", value: "topics", icon: Hash },
-          ].map((filter) => {
-            const Icon = filter.icon;
-            return (
-              <TabsTrigger key={filter.value} value={filter.value}>
-                <Icon className="mr-1.5 size-3.5" />
-                {filter.label}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
+          {/* Raw markdown fallback */}
+          {insights.length === 0 && result && (
+            <Card size="sm">
+              <CardContent className="max-h-64 overflow-y-auto p-4">
+                <pre className="whitespace-pre-wrap text-xs text-neutral-600">{result}</pre>
+              </CardContent>
+            </Card>
+          )}
 
-        <TabsContent value="overview" className="mt-6 space-y-6">
-          {/* Weekly Activity Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Weekly Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between gap-2">
-                {weeklyActivity.map((day) => (
-                  <div
-                    key={day.day}
-                    className="group relative flex flex-1 flex-col items-center gap-2"
-                  >
-                    <div className="flex w-full flex-col items-center gap-0.5">
-                      <div
-                        className="w-full rounded-t bg-rose-100 transition-all duration-200 group-hover:bg-rose-200"
-                        style={{
-                          height: `${(day.queries / maxQuery) * 120}px`,
-                        }}
-                      />
-                      <div
-                        className="w-full rounded-t bg-amber-100 transition-all duration-200 group-hover:bg-amber-200"
-                        style={{
-                          height: `${(day.documents / maxDoc) * 60}px`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-[10px] font-medium text-neutral-500">
-                      {day.day}
-                    </span>
-                    {/* Tooltip */}
-                    <div className="pointer-events-none absolute -top-2 left-1/2 z-10 -translate-x-1/2 -translate-y-full opacity-0 transition-opacity group-hover:opacity-100">
-                      <div className="whitespace-nowrap rounded-lg bg-neutral-800 px-2.5 py-1.5 text-xs text-white shadow-lg">
-                        <p>{day.queries} queries</p>
-                        <p>{day.documents} documents</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {/* New insight button */}
+          {!isGenerating && (
+            <div className="flex justify-center pt-4">
+              <Button variant="outline" onClick={() => { setResult(null); setInsights([]); }}>
+                <Sparkles className="mr-2 size-4" />
+                Generate New Insights
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tips */}
+      {!result && !isGenerating && (
+        <Card size="sm">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-amber-50">
+                <Lightbulb className="size-4 text-amber-500" />
               </div>
-              <div className="mt-4 flex items-center justify-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="size-3 rounded bg-rose-100" />
-                  <span className="text-xs text-neutral-500">Queries</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="size-3 rounded bg-amber-100" />
-                  <span className="text-xs text-neutral-500">Documents</span>
-                </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-neutral-700">How it works</p>
+                <ul className="space-y-0.5 text-[11px] text-neutral-500">
+                  <li>• Upload documents in chat first, then select that session here</li>
+                  <li>• AI extracts key findings, patterns, and actionable insights</li>
+                  <li>• Use insights to guide research or decision-making</li>
+                </ul>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Insights</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentInsights.map((insight) => (
-                <div
-                  key={insight.title}
-                  className="group rounded-xl border border-transparent p-4 transition-all duration-200 hover:border-neutral-200 hover:shadow-sm"
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={`border text-[10px] ${
-                        insight.impact === "positive"
-                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                          : insight.impact === "info"
-                            ? "border-blue-200 bg-blue-50 text-blue-700"
-                            : "border-amber-200 bg-amber-50 text-amber-700"
-                      }`}
-                    >
-                      {insight.category}
-                    </Badge>
-                    <span className="text-[10px] text-neutral-400">
-                      {insight.date}
-                    </span>
-                  </div>
-                  <h3 className="mb-1 text-sm font-semibold text-neutral-800">
-                    {insight.title}
-                  </h3>
-                  <p className="text-xs leading-relaxed text-neutral-500">
-                    {insight.description}
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="activity" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Query Activity Breakdown</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {weeklyActivity.map((day) => (
-                  <div key={day.day} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-neutral-700">
-                        {day.day}
-                      </span>
-                      <span className="text-neutral-500">
-                        {day.queries} queries
-                      </span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-neutral-100">
-                      <motion.div
-                        className="h-full rounded-full bg-(image:--color-theme-gradient)"
-                        initial={{ width: 0 }}
-                        animate={{
-                          width: `${(day.queries / maxQuery) * 100}%`,
-                        }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="topics" className="mt-6 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Top Topics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {topTopics.map((topic, index) => (
-                  <div
-                    key={topic.topic}
-                    className="flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-neutral-50"
-                  >
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-neutral-100 text-[11px] font-bold text-neutral-500">
-                      {index + 1}
-                    </span>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-neutral-800">
-                        {topic.topic}
-                      </p>
-                      <p className="text-xs text-neutral-400">
-                        {topic.count} queries
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {topic.growth >= 0 ? (
-                        <ArrowUpRight className="size-3.5 text-emerald-500" />
-                      ) : (
-                        <ArrowDownRight className="size-3.5 text-rose-500" />
-                      )}
-                      <span
-                        className={`text-xs font-medium ${
-                          topic.growth >= 0
-                            ? "text-emerald-600"
-                            : "text-rose-600"
-                        }`}
-                      >
-                        {Math.abs(topic.growth)}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
