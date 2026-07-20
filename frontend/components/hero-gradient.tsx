@@ -2,7 +2,7 @@ import React from "react";
 
 export function HeroGradient() {
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 flex justify-center overflow-hidden rounded-xl">
+    <div className="pointer-events-none absolute inset-0 z-0 flex justify-center overflow-hidden ">
       {/* Base ambient linear */}
       <div className="bg-linear-to-b absolute inset-0 from-[#dae9ff] via-[#f2f6fa] to-[#ffc7b6] opacity-60 lg:bg-linear-to-b"></div>
 

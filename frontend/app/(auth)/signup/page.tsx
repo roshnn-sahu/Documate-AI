@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {icons} from "@/components/icons";
+import { icons } from "@/components/icons";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -111,6 +111,7 @@ export default function SignupPage() {
           className="mb-4 h-12 rounded-lg border-gray-200 bg-gray-50 px-4 text-sm"
         />
         <Button
+          variant="themeGradient"
           type="submit"
           disabled={loading}
           className="h-12 w-full rounded-lg bg-black text-white hover:bg-gray-800"
@@ -134,7 +135,10 @@ export default function SignupPage() {
       {/* Login Link */}
       <p className="mt-8 text-sm text-gray-600">
         Already a user?{" "}
-        <Link href="/login" className="font-medium text-black underline hover:text-gray-700">
+        <Link
+          href="/login"
+          className="font-medium text-black underline hover:text-gray-700"
+        >
           Log in
         </Link>
       </p>

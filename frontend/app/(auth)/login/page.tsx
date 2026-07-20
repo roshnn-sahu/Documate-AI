@@ -93,6 +93,7 @@ export default function LoginPage() {
           className="mb-4 h-12 rounded-lg border-gray-200 bg-gray-50 px-4 text-sm"
         />
         <Button
+          variant="themeGradient"
           type="submit"
           disabled={loading}
           className="h-12 w-full rounded-lg bg-black text-white hover:bg-gray-800"
