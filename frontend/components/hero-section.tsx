@@ -176,7 +176,7 @@ export default function HeroSection() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className="mb-8"
       >
-        <Badge className="gap-2 bg-linear-to-br from-rose-500 to-orange-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-500/25">
+        <Badge className="gap-2 bg-linear-to-br from-rose-500 to-orange-500 px-4 py-3  text-xs lg:text-sm font-semibold text-white shadow-lg shadow-rose-500/25">
           <motion.div
             animate={{ rotate: [0, 15, -15, 0] }}
             transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}

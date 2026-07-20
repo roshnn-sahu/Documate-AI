@@ -4,7 +4,7 @@ export function HeroGradient() {
   return (
     <div className="pointer-events-none absolute inset-0 z-0 flex justify-center overflow-hidden rounded-xl">
       {/* Base ambient linear */}
-      <div className="absolute inset-0 bg-linear-to-b from-[#dae9ff] via-[#f2f6fa] to-[#ffc7b6] opacity-60"></div>
+      <div className="bg-linear-to-b absolute inset-0 from-[#dae9ff] via-[#f2f6fa] to-[#ffc7b6] opacity-60 lg:bg-linear-to-b"></div>
 
       {/* Sunburst Rays - Using CSS repeating-conic-linear */}
       <div

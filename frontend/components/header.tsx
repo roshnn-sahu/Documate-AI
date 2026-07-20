@@ -12,13 +12,13 @@ const Header = () => {
             <div className="bg-(image:--color-theme-gradient) flex size-8 items-center justify-center rounded-lg text-white shadow-sm shadow-rose-200/50">
               <Image
                 src="/logo.png"
-                alt="Hero Graphic"
+                alt="Logo"
                 width={50}
                 height={50}
                 className="rounded-full p-1"
               />
             </div>
-            <span className="text-xl font-bold tracking-tight text-[#1e293b]">
+            <span className=" hidden md:flex lg:text-xl font-bold tracking-tight text-[#1e293b]">
               Documate AI
             </span>
           </Link>
@@ -49,10 +49,10 @@ const Header = () => {
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="themeOutline" size="sm" className="rounded-full px-5">
               <Link href="/login">Log in</Link>
             </Button>
-            <Button asChild size="sm">
+            <Button asChild variant="themeGradient" size="sm" className="rounded-full px-5 font-semibold">
               <Link href="/signup">Sign up</Link>
             </Button>
           </div>
