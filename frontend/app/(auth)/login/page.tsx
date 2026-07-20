@@ -8,14 +8,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { icons } from "@/components/icons";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,52 +35,94 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to sign in with Google");
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your Documate AI account</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email" className="">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="password" className="">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Signing in…" : "Sign in"}
-            </Button>
-          </form>
-          <p className="text-muted-foreground mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-foreground underline">
-              Sign up
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+    <div className="flex flex-col items-center">
+      {/* Title */}
+      <h1 className="mb-8 text-3xl font-semibold text-gray-900">
+        Welcome back
+      </h1>
+
+      {/* Google Sign In Button */}
+      <button
+        type="button"
+        onClick={handleGoogleSignIn}
+        className="mb-6 flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+      >
+        <icons.google />
+        Sign in with Google
+      </button>
+
+      {/* Divider */}
+      <div className="mb-6 flex w-full items-center gap-4">
+        <div className="h-px flex-1 bg-gray-200"></div>
+        <span className="text-sm text-gray-500">or</span>
+        <div className="h-px flex-1 bg-gray-200"></div>
+      </div>
+
+      {/* Email Form */}
+      <form onSubmit={handleSubmit} className="w-full">
+        <Input
+          type="email"
+          placeholder="Enter Your Email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="mb-3 h-12 rounded-lg border-gray-200 bg-gray-50 px-4 text-sm"
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="mb-4 h-12 rounded-lg border-gray-200 bg-gray-50 px-4 text-sm"
+        />
+        <Button
+          type="submit"
+          disabled={loading}
+          className="h-12 w-full rounded-lg bg-black text-white hover:bg-gray-800"
+        >
+          {loading ? "Signing in..." : "Continue"}
+        </Button>
+      </form>
+
+      {/* Terms */}
+      <p className="mt-6 text-center text-xs text-gray-500">
+        By proceeding, you accept the{" "}
+        <Link href="/terms" className="underline hover:text-gray-700">
+          Terms
+        </Link>{" "}
+        and{" "}
+        <Link href="/privacy" className="underline hover:text-gray-700">
+          Privacy Policy
+        </Link>
+      </p>
+
+      {/* Signup Link */}
+      <p className="mt-8 text-sm text-gray-600">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/signup"
+          className="font-medium text-black underline hover:text-gray-700"
+        >
+          Sign up
+        </Link>
+      </p>
     </div>
   );
 }
