@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ChevronDown, Loader2, MessageSquare } from "lucide-react";
+import { listSessions } from "@/lib/services/chat";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,10 +36,8 @@ export function SessionPicker({
   useEffect(() => {
     async function fetchSessions() {
       try {
-        const res = await fetch("/api/chat/sessions");
-        if (!res.ok) throw new Error("Failed to fetch sessions");
-        const data = await res.json();
-        setSessions(data.sessions || []);
+        const sessionsData = await listSessions();
+        setSessions(sessionsData);
       } catch (err: any) {
         setError(err.message);
       } finally {

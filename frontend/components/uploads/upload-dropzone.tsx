@@ -18,6 +18,7 @@ import {
   Trash2,
   Sparkles,
 } from "lucide-react";
+import { uploadFile } from "@/lib/services/upload";
 
 type FileStatus = "uploading" | "processing" | "ready" | "error";
 
@@ -105,15 +106,7 @@ export default function UploadDropzone() {
       const formData = new FormData();
       formData.append("file", uploadedFile.file);
 
-      const res = await fetch("/api/uploads", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || `Upload failed (${res.status})`);
-      }
+      await uploadFile(formData);
 
       setFiles((prev) =>
         prev.map((f) =>

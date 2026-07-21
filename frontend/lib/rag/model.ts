@@ -2,9 +2,12 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { ChatGroq } from "@langchain/groq";
 
 // Document embeddings — OpenRouter / Nvidia Nemotron
+// NOTE: encodingFormat must be "float" because the default "base64" is
+// rejected by the Nvidia model on OpenRouter.
 export const model = new OpenAIEmbeddings({
   apiKey: process.env.OPENROUTER_API_KEY,
   model: "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+  encodingFormat: "float",
   configuration: {  
     baseURL: "https://openrouter.ai/api/v1",  
   },
