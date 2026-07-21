@@ -32,6 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { SpeechInput } from "./speech-input";
 import { toast } from "sonner";
+import { createSession } from "@/lib/services/chat";
 
 // Types accepted end-to-end: parsed to text (docs) or read via vision (images).
 const ACCEPTED_TYPES = [
@@ -111,16 +112,7 @@ const AiInput = ({
         formData.append("file", file);
       });
 
-      const response = await fetch("/api/chat/create", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create chat");
-      }
+      const data = await createSession(formData);
 
       setMessage("");
       setFiles([]);

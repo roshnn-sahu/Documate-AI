@@ -16,6 +16,7 @@ import {
 
 import Message from "./message";
 import AiInput from "./ai-input";
+import { sendMessage as sendChatMessage } from "@/lib/services/chat";
 import { ToolsResults } from "@/types/tools-results";
 import { BotIcon } from "lucide-react";
 import { HeroGradient } from "../hero-gradient";
@@ -88,36 +89,15 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
         },
       ]);
 
-      // Send files via FormData if there are attachments, otherwise JSON
-      let response: Response;
-      if (files && files.length > 0) {
-        const formData = new FormData();
-        formData.append("message", message);
-        files.forEach((file) => {
-          formData.append("files", file);
-        });
-        response = await fetch(`/api/chat/${sessionId}`, {
-          method: "POST",
-          body: formData,
-        });
-      } else {
-        response = await fetch(`/api/chat/${sessionId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message }),
-        });
-      }
+      const response = await sendChatMessage(sessionId, message, files);
+      console.log(response, "Response received");
 
       if (!response.ok) {
         let serverMessage = "Failed to send message";
         try {
           const errData = await response.json();
           if (errData?.error) serverMessage = errData.error;
-        } catch {
-          // response wasn't JSON — keep the default message
-        }
+        } catch {}
         throw new Error(serverMessage);
       }
 
@@ -158,7 +138,6 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
       }
     } catch (error: any) {
       console.error("Streaming error:", error);
-
       const detail =
         error?.message || "Something went wrong while generating response.";
 

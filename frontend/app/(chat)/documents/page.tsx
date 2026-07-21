@@ -19,6 +19,7 @@ import {
   Image,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { listDocuments } from "@/lib/services/document";
 
 interface DocumentItem {
   id: string;
@@ -133,11 +134,9 @@ export default function DocumentsPage() {
       try {
         setLoading(true);
         setError(false);
-        const res = await fetch("/api/documents");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        if (data.documents && data.documents.length > 0) {
-          setDocuments(data.documents);
+        const docs = await listDocuments();
+        if (docs && docs.length > 0) {
+          setDocuments(docs);
         } else {
           setDocuments(demoDocuments);
         }

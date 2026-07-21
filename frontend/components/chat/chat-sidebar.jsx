@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +44,25 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
+import {
   TerminalSquareIcon,
   BotIcon,
   BookOpen,
@@ -58,19 +78,30 @@ import {
   Files,
   Waypoints,
   Star,
+  ChartGanttIcon,
+  Ellipsis,
+  Trash2,
+  Pencil,
+  Share,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTool } from "@/context/tool-context";
 import Image from "next/image";
+import { signOut } from "@/lib/services/auth";
+import { deleteSession, renameSession } from "@/lib/services/chat";
 
 // Fixed syntax error and added ToolProvider support
 
 export function ChatSidebar({ children, user, sessions = [] }) {
   const router = useRouter();
   const { runTool } = useTool();
+  const [isDeleting, setIsDeleting] = useState(null); // sessionId being deleted
+  const [renameTarget, setRenameTarget] = useState(null); // { id, title }
+  const [renameValue, setRenameValue] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleLogout = async () => {
-    await fetch("/auth/signout", { method: "POST" });
+    await signOut();
     router.push("/login");
     router.refresh();
   };
@@ -81,6 +112,36 @@ export function ChatSidebar({ children, user, sessions = [] }) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const handleDeleteChat = async (id) => {
+    try {
+      await deleteSession(id);
+      router.refresh();
+    } catch (err) {
+      console.error("Delete error:", err);
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  const openRenameDialog = (session) => {
+    setRenameTarget(session);
+    setRenameValue(session.title || "");
+  };
+
+  const handleRenameSave = async () => {
+    if (!renameTarget || !renameValue.trim()) return;
+    setIsSaving(true);
+    try {
+      await renameSession(renameTarget.id, renameValue.trim());
+      setRenameTarget(null);
+      router.refresh();
+    } catch (err) {
+      console.error("Rename error:", err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const data = {
     user: {
@@ -273,6 +334,7 @@ export function ChatSidebar({ children, user, sessions = [] }) {
 
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel>History</SidebarGroupLabel>
+
             <SidebarMenu>
               {sessions.length === 0 ? (
                 <p className="text-muted-foreground px-2 py-1 text-xs">
@@ -286,10 +348,36 @@ export function ChatSidebar({ children, user, sessions = [] }) {
                       tooltip={s.title}
                       className="cursor-pointer"
                     >
-                      <span onClick={() => router.push(`/chat/${s.id}`)}>
-                        <BotIcon />
-                        <span className="truncate">{s.title}</span>
-                      </span>
+                      <div className="flex w-full items-center justify-between">
+                        <span onClick={() => router.push(`/chat/${s.id}`)}>
+                          <span className="truncate">{s.title}</span>
+                        </span>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Ellipsis />
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent>
+                            <DropdownMenuLabel>
+                              {" "}
+                              <Share className="size-4" /> Share
+                            </DropdownMenuLabel>
+                            <DropdownMenuLabel
+                              onClick={() => openRenameDialog(s)}
+                            >
+                              {" "}
+                              <Pencil className="size-4" /> Rename
+                            </DropdownMenuLabel>
+                            <DropdownMenuLabel
+                              className="text-red-600"
+                              onClick={() => setIsDeleting(s.id)}
+                            >
+                              <Trash2 className="size-4" /> Delete
+                            </DropdownMenuLabel>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))
@@ -359,8 +447,8 @@ export function ChatSidebar({ children, user, sessions = [] }) {
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem onClick={handleLogout}>
-                    Log out
-                  </DropdownMenuItem>
+                      Log out
+                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -434,6 +522,74 @@ export function ChatSidebar({ children, user, sessions = [] }) {
           {children}
         </main>
       </SidebarInset>
+
+      {/* Rename Dialog */}
+      <Dialog
+        open={renameTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setRenameTarget(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename chat</DialogTitle>
+            <DialogDescription>
+              Give this chat a new name to find it easily later.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            placeholder="Enter a new name..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !isSaving) handleRenameSave();
+              if (e.key === "Escape") setRenameTarget(null);
+            }}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRenameTarget(null)}
+              disabled={isSaving}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleRenameSave} disabled={isSaving || !renameValue.trim()}>
+              {isSaving ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleting !== null}
+        onOpenChange={(open) => {
+          if (!open) setIsDeleting(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete chat?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this chat and all its messages. This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleting(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => handleDeleteChat(isDeleting)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarProvider>
   );
 }
