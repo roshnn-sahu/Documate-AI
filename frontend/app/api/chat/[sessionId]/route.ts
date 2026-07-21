@@ -20,9 +20,7 @@ export async function POST(req: Request, { params }: Props) {
     const { sessionId } = await params;
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const {data: { user }} = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -91,20 +89,32 @@ export async function POST(req: Request, { params }: Props) {
     const readableStream = new ReadableStream({
       async start(controller) {
         let assistantText = "";
-        for await (const chunk of stream) {
-          const token = chunk.content;
+        try {
+          for await (const chunk of stream) {
+            const token = chunk?.content;
 
-          // Handle both string and array content formats from LangChain.
-          const text =
-            typeof token === "string"
-              ? token
-              : token
-                  .filter((block: any) => block.type === "text")
-                  .map((block: any) => block.text)
-                  .join("");
+            if (token == null) {
+              console.warn("[Chat API] Received chunk with no content, skipping");
+              continue;
+            }
 
-          assistantText += text;
-          controller.enqueue(encoder.encode(text));
+            // Handle both string and array content formats from LangChain.
+            const text =
+              typeof token === "string"
+                ? token
+                : Array.isArray(token)
+                  ? token
+                      .filter((block: any) => block?.type === "text")
+                      .map((block: any) => block?.text ?? "")
+                      .join("")
+                  : String(token);
+
+            assistantText += text;
+            controller.enqueue(encoder.encode(text));
+          }
+        } catch (streamError: any) {
+          console.error("[Chat API] Stream iteration error:", streamError);
+          controller.enqueue(encoder.encode("\n\n⚠️ Error generating response. Please try again."));
         }
 
         // Persist the assistant reply + bump the session (best-effort).
@@ -144,6 +154,7 @@ export async function POST(req: Request, { params }: Props) {
       },
     });
   } catch (error: any) {
+    console.error("[Chat API] Error:", error);
     return NextResponse.json(
       { error: error.message || "Chat failed" },
       { status: 500 },

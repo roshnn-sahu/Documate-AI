@@ -53,18 +53,29 @@ export async function POST(req: Request, { params }: Props) {
 
     const readableStream = new ReadableStream({
       async start(controller) {
-        for await (const chunk of stream) {
-          const token = chunk.content;
+        try {
+          for await (const chunk of stream) {
+            const token = chunk?.content;
 
-          const text =
-            typeof token === "string"
-              ? token
-              : token
-                  .filter((block: any) => block.type === "text")
-                  .map((block: any) => block.text)
-                  .join("");
+            if (token == null) {
+              continue;
+            }
 
-          controller.enqueue(encoder.encode(text));
+            const text =
+              typeof token === "string"
+                ? token
+                : Array.isArray(token)
+                  ? token
+                      .filter((block: any) => block?.type === "text")
+                      .map((block: any) => block?.text ?? "")
+                      .join("")
+                  : String(token);
+
+            controller.enqueue(encoder.encode(text));
+          }
+        } catch (streamError: any) {
+          console.error("[Tools API] Stream error:", streamError);
+          controller.enqueue(encoder.encode("\n\n⚠️ Error generating response. Please try again."));
         }
 
         controller.close();

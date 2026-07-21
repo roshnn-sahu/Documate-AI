@@ -162,7 +162,9 @@ const AiInput = ({
             toast.error(
               `Unsupported file type: ${rejected
                 .map((f) => f.name)
-                .join(", ")}. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP.`,
+                .join(
+                  ", ",
+                )}. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP.`,
             );
           }
 
@@ -222,27 +224,34 @@ const AiInput = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <InputGroupButton
-                className="text-md rounded-full border"
+                className="text-md cursor-pointer rounded-full border"
                 variant="ghost"
               >
                 <Plus />
               </InputGroupButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" side="top">
-              <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 <PaperclipIcon />
                 Attach File
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <InputGroupButton size="icon-xs" variant="ghost" className="ml-auto">
+          <InputGroupButton
+            size="icon-xs"
+            variant="ghost"
+            className="ml-auto cursor-pointer"
+          >
             <SpeechInput mode="speech-recognition" className="p-0" />
           </InputGroupButton>
 
           <Separator className="!h-4" orientation="vertical" />
           <InputGroupButton
-            className="rounded-full"
+            className="cursor-pointer rounded-full"
             size="icon-sm"
             variant="default"
             onClick={handleSubmit}
