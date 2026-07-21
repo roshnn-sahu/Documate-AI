@@ -90,7 +90,6 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
       ]);
 
       const response = await sendChatMessage(sessionId, message, files);
-      console.log(response, "Response received");
 
       if (!response.ok) {
         let serverMessage = "Failed to send message";

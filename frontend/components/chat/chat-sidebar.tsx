@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,21 +84,112 @@ import {
   Pencil,
   Share,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTool } from "@/context/tool-context";
 import Image from "next/image";
 import { signOut } from "@/lib/services/auth";
-import { deleteSession, renameSession } from "@/lib/services/chat";
+import {
+  deleteSession,
+  renameSession,
+  listSessions,
+} from "@/lib/services/chat";
+import { createClient } from "@/lib/supabase/client";
 
 // Fixed syntax error and added ToolProvider support
 
-export function ChatSidebar({ children, user, sessions = [] }) {
+export function ChatSidebar({
+  children,
+  user,
+  sessions = [],
+}: {
+  children: React.ReactNode;
+  user: any;
+  sessions: any[];
+}) {
   const router = useRouter();
+  const pathname = usePathname();
   const { runTool } = useTool();
-  const [isDeleting, setIsDeleting] = useState(null); // sessionId being deleted
-  const [renameTarget, setRenameTarget] = useState(null); // { id, title }
+  const [localSessions, setLocalSessions] = useState(sessions);
+
+  // Fetch sessions from the API whenever the route changes.
+  // This solves the issue where the server layout doesn't re-fetch
+  // during client-side navigation between pages sharing the same layout.
+  useEffect(() => {
+    let mounted = true;
+    listSessions()
+      .then((sessions) => {
+        if (mounted) setLocalSessions(sessions);
+      })
+      .catch(() => {
+        // Silently fail — the real-time subscription or server prop
+        // will eventually update the list.
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null); // sessionId being deleted
+  const [renameTarget, setRenameTarget] = useState<{ id: string; title?: string } | null>(null); // { id, title }
   const [renameValue, setRenameValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Re-sync from server-side data when navigating between pages
+  useEffect(() => {
+    setLocalSessions(sessions);
+  }, [sessions]);
+
+  // Real-time subscription for instant updates across tabs/windows
+  useEffect(() => {
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch {
+      return; // Supabase not configured
+    }
+
+    const channel = supabase
+      .channel(`chat_sessions_${crypto.randomUUID()}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chat_sessions",
+        },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setLocalSessions((prev) => {
+              // Avoid duplicates
+              if (prev.some((s) => s.id === payload.new.id)) return prev;
+              return [
+                {
+                  id: payload.new.id,
+                  title: payload.new.title || "New chat",
+                },
+                ...prev,
+              ];
+            });
+          } else if (payload.eventType === "UPDATE") {
+            setLocalSessions((prev) =>
+              prev.map((s) =>
+                s.id === payload.new.id
+                  ? { ...s, title: payload.new.title }
+                  : s,
+              ),
+            );
+          } else if (payload.eventType === "DELETE") {
+            setLocalSessions((prev) =>
+              prev.filter((s) => s.id !== payload.old.id),
+            );
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -108,12 +199,12 @@ export function ChatSidebar({ children, user, sessions = [] }) {
 
   const initials = (user?.name || "U")
     .split(" ")
-    .map((w) => w[0])
+    .map((w:any) => w[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 
-  const handleDeleteChat = async (id) => {
+  const handleDeleteChat = async (id: string) => {
     try {
       await deleteSession(id);
       router.refresh();
@@ -124,7 +215,7 @@ export function ChatSidebar({ children, user, sessions = [] }) {
     }
   };
 
-  const openRenameDialog = (session) => {
+  const openRenameDialog = (session: any) => {
     setRenameTarget(session);
     setRenameValue(session.title || "");
   };
@@ -336,12 +427,12 @@ export function ChatSidebar({ children, user, sessions = [] }) {
             <SidebarGroupLabel>History</SidebarGroupLabel>
 
             <SidebarMenu>
-              {sessions.length === 0 ? (
+              {localSessions.length === 0 ? (
                 <p className="text-muted-foreground px-2 py-1 text-xs">
                   No chats yet
                 </p>
               ) : (
-                sessions.map((s) => (
+                localSessions.map((s) => (
                   <SidebarMenuItem key={s.id}>
                     <SidebarMenuButton
                       asChild
@@ -555,7 +646,10 @@ export function ChatSidebar({ children, user, sessions = [] }) {
             >
               Cancel
             </Button>
-            <Button onClick={handleRenameSave} disabled={isSaving || !renameValue.trim()}>
+            <Button
+              onClick={handleRenameSave}
+              disabled={isSaving || !renameValue.trim()}
+            >
               {isSaving ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
@@ -583,7 +677,7 @@ export function ChatSidebar({ children, user, sessions = [] }) {
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-600 hover:bg-red-700"
-              onClick={() => handleDeleteChat(isDeleting)}
+              onClick={() => handleDeleteChat(isDeleting!)}
             >
               Delete
             </AlertDialogAction>

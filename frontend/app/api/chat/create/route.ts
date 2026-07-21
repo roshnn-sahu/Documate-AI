@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { generateChatTitle } from "@/lib/services/chat";
+import { generateTitle } from "@/lib/rag/generate-title";
 import { processFile } from "@/lib/uploads/process-file";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       if (file && file.size > 0 && file.name) {
         title = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
       } else if (message.trim()) {
-        title = await generateChatTitle(message);
+        title = await generateTitle(message);
       }
     } catch (titleError) {
       console.error(
