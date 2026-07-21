@@ -6,7 +6,7 @@ export interface Session {
   updated_at?: string;
 }
 
-/** Fetch all sessions for the current user. */
+// Fetch all sessions for the current user.
 export async function listSessions(): Promise<Session[]> {
   const { data } = await apiClient.get<{ sessions: Session[] }>(
     "/api/chat/sessions",
@@ -14,15 +14,15 @@ export async function listSessions(): Promise<Session[]> {
   return data.sessions || [];
 }
 
-/** Create a new chat session (optionally with a file). */
+// Create a new chat session (optionally with a file).
 export async function createSession(formData: FormData): Promise<{
   sessionId: string;
   message: string;
   document?: unknown;
 }> {
-  // NOTE: Do NOT set Content-Type manually — axios will set the correct
-  // multipart boundary when it detects FormData.
-  const { data } = await apiClient.post("/api/chat/create", formData);
+  const { data } = await apiClient.post("/api/chat/create", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return data;
 }
 
@@ -39,10 +39,10 @@ export async function deleteSession(sessionId: string): Promise<void> {
   await apiClient.delete(`/api/chat/sessions/${sessionId}`);
 }
 
-/**
- * Send a message to a session and get back a ReadableStream response.
- * Uses native fetch because axios doesn't support streaming responses in the browser.
- */
+
+//  Send a message to a session and get back a ReadableStream response.
+//  Uses native fetch because axios doesn't support streaming responses in the browser.
+
 export async function sendMessage(
   sessionId: string,
   message: string,
@@ -61,3 +61,17 @@ export async function sendMessage(
     body: JSON.stringify({ message }),
   });
 }
+
+//Generate Chat Title
+export const generateChatTitle = async (message: string) => {
+  const { data } = await apiClient.post(
+    "/api/chat/generate-chat-title",
+    {
+      message,
+    },
+    {
+      headers: { "Content-Type": "application/json" },
+    },
+  );
+  return data.title;
+};

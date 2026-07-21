@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-
+import { generateChatTitle } from "@/lib/services/chat";
 import { processFile } from "@/lib/uploads/process-file";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,14 +17,24 @@ export async function POST(req: Request) {
     }
 
     const formData = await req.formData();
+
     const message = (formData.get("message") as string) || "";
     const file = formData.get("file") as File | null;
+    let title = "New chat";
 
-    // Create a DB-backed session owned by this user.
-    const title =
-      file && file.name
-        ? file.name
-        : message.slice(0, 60) || "New chat";
+    try {
+      if (file && file.size > 0 && file.name) {
+        title = file.name.substring(0, file.name.lastIndexOf(".")) || file.name;
+      } else if (message.trim()) {
+        title = await generateChatTitle(message);
+      }
+    } catch (titleError) {
+      console.error(
+        "Failed to generate custom title, using fallback:",
+        titleError,
+      );
+      title = "New chat"; 
+    }
 
     const { data: session, error: sessionError } = await supabase
       .from("chat_sessions")
