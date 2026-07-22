@@ -1,7 +1,8 @@
 import { v2 as cloudinary } from "cloudinary";
+import {CLOUDINARY_URL} from "@/config/config"
 
 // Configure Cloudinary only when env vars are present.
-const configured = Boolean(process.env.CLOUDINARY_URL);
+const configured = Boolean(CLOUDINARY_URL);
 
 if (configured) {
   cloudinary.config({

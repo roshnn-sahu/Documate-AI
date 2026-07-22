@@ -1,6 +1,7 @@
 // Vision-based text extraction for image uploads.
 // Uses an OpenRouter vision model to OCR + describe an image so it can be
 // ingested into the RAG pipeline like any other document.
+import {OPENROUTER_API_KEY} from "@/config/config";
 
 const VISION_MODEL = "nvidia/nemotron-nano-12b-v2-vl:free";
 
@@ -9,11 +10,8 @@ export async function describeImage(
   mimeType: string,
   fileName: string,
 ) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENROUTER_API_KEY is not configured");
-  }
-
+  const apiKey = OPENROUTER_API_KEY;
+ 
   const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
 
   // Free-tier vision models can be slow / rate-limited; fail with a clear
