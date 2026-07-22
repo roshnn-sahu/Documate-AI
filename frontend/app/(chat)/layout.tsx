@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 import { ChatSidebar } from "@/components/chat/chat-sidebar";
 import { ToolProvider } from "@/context/tool-context";
-import { createClient } from "@/lib/supabase/server";
 
-const supabaseConfigured = Boolean(
-  process.env.NEXT_PUBLIC_SUPABASE_URL &&
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-);
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/config/config";
+
+const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 export default async function ChatLayout({
   children,

@@ -151,7 +151,8 @@ export default function HeroSection() {
       ref={sectionRef}
       className="relative z-10 mx-auto flex min-h-screen flex-col items-center overflow-hidden px-4 pt-40 pb-20"
     >
-      <HeroGradient />
+      
+      <HeroGradient className="rounded-xl" />
 
       {/* ── Floating particles ── */}
       <div className="pointer-events-none absolute inset-0">

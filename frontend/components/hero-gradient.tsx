@@ -1,10 +1,11 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
-export function HeroGradient() {
+export function HeroGradient({className=""}:{className?:string}) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 flex justify-center overflow-hidden ">
+    <div className={cn("pointer-events-none absolute inset-0 z-0 flex justify-center overflow-hidden ", className)}>
       {/* Base ambient linear */}
-      <div className="bg-linear-to-b absolute inset-0 from-[#dae9ff] via-[#f2f6fa] to-[#ffc7b6] opacity-60 lg:bg-linear-to-b"></div>
+      <div className="bg-linear-to-b absolute inset-0 from-[#dae9ff] via-[#f2f6fa] to-[#ffc7b6] opacity-70 lg:bg-linear-to-b"></div>
 
       {/* Sunburst Rays - Using CSS repeating-conic-linear */}
       <div

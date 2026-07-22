@@ -9,7 +9,7 @@ const page = () => {
       <HeroGradient />
       <div className="flex h-full w-full flex-col items-center justify-center">
         <div className="relative z-10 mb-6 flex flex-col items-center justify-center">
-          <h2 className="font-bricolage mb-3 text-neutral-900 text-center text-4xl font-bold md:text-5xl">
+          <h2 className="font-bricolage mb-3 text-center text-4xl font-bold text-neutral-900 md:text-5xl">
             How can i assist you?
           </h2>
           <p className="text-md text-center text-neutral-600">
