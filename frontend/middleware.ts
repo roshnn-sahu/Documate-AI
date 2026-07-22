@@ -1,12 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Refreshes the Supabase auth session on every request and (once auth pages
-// exist) redirects unauthenticated users away from protected routes.
-//
-// NOTE: Next.js 16+ deprecated the "middleware.ts" convention in favour of
-// "proxy.ts".  The exported function must be named "proxy".
-export async function proxy(request: NextRequest) {
+// Refreshes the Supabase auth session on every request and redirects 
+// unauthenticated users away from protected routes.
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   // Until Supabase is configured, skip auth entirely so the app still runs.
