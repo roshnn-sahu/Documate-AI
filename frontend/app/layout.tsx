@@ -1,6 +1,6 @@
 import { Inter, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
+// import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const fontBricolage = Bricolage_Grotesque({
@@ -82,7 +82,7 @@ export default function RootLayout({
     >
       <body className="antialiased">
         {children}
-        <Toaster richColors position="top-center" />
+        {/* <Toaster richColors position="top-center" /> */}
       </body>
     </html>
   );
