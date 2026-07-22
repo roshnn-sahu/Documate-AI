@@ -1,8 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config/config";
-// Refreshes the Supabase auth session on every request and redirects
-// unauthenticated users away from protected routes.
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 

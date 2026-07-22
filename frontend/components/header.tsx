@@ -5,14 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/config/config";
 
-const supabaseConfigured = Boolean(
-  SUPABASE_URL && SUPABASE_ANON_KEY
-);
+const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 const Header = async () => {
   let User = {
-    name: "Guest",
-    email: "",
-    avatar: "",
+    name: null,
+    email: null,
+    avatar: null,
   };
 
   if (supabaseConfigured) {
@@ -21,8 +19,15 @@ const Header = async () => {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) redirect("/login");
+    if (user) {
+      User = {
+        name: user.user_metadata?.full_name ?? "",
+        email: user.email ?? "",
+        avatar: user.user_metadata?.avatar_url ?? "",
+      };
+    }
   }
+
   return (
     <>
       <nav className="fixed top-6 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 px-4">
@@ -68,22 +73,35 @@ const Header = async () => {
             </a>
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              asChild
-              variant="themeOutline"
-              size="sm"
-              className="rounded-full px-5"
-            >
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button
-              asChild
-              variant="themeGradient"
-              size="sm"
-              className="rounded-full px-5 font-semibold"
-            >
-              <Link href="/signup">Sign up</Link>
-            </Button>
+            {User.name ? (
+              <Button
+                asChild
+                variant="themeOutline"
+                size="sm"
+                className=" px-5"
+              >
+                <Link href="/chat/new">Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  asChild
+                  variant="themeOutline"
+                  size="sm"
+                  className="rounded-full px-5"
+                >
+                  <Link href="/login">Log in</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="themeGradient"
+                  size="sm"
+                  className="rounded-full px-5 font-semibold"
+                >
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>

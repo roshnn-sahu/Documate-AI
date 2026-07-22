@@ -95,8 +95,6 @@ import {
 } from "@/lib/services/chat";
 import { createClient } from "@/lib/supabase/client";
 
-// Fixed syntax error and added ToolProvider support
-
 export function ChatSidebar({
   children,
   user,
@@ -129,7 +127,10 @@ export function ChatSidebar({
     };
   }, [pathname]);
   const [isDeleting, setIsDeleting] = useState<string | null>(null); // sessionId being deleted
-  const [renameTarget, setRenameTarget] = useState<{ id: string; title?: string } | null>(null); // { id, title }
+  const [renameTarget, setRenameTarget] = useState<{
+    id: string;
+    title?: string;
+  } | null>(null); // { id, title }
   const [renameValue, setRenameValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -199,7 +200,7 @@ export function ChatSidebar({
 
   const initials = (user?.name || "U")
     .split(" ")
-    .map((w:any) => w[0])
+    .map((w: any) => w[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
@@ -519,7 +520,9 @@ export function ChatSidebar({
                               src={data.user.avatar || "/placeholder.svg"}
                               alt={data.user.name}
                             />
-                            <AvatarFallback>CN</AvatarFallback>
+                            <AvatarFallback className="rounded-lg">
+                              {initials}
+                            </AvatarFallback>
                           </Avatar>
                         </ItemMedia>
                         <ItemContent>
@@ -567,7 +570,9 @@ export function ChatSidebar({
                       src={data.user.avatar || "/placeholder.svg"}
                       alt={data.user.name}
                     />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -582,7 +587,9 @@ export function ChatSidebar({
                             src={data.user.avatar || "/placeholder.svg"}
                             alt={data.user.name}
                           />
-                          <AvatarFallback>CN</AvatarFallback>
+                          <AvatarFallback className="rounded-lg">
+                            {initials}
+                          </AvatarFallback>
                         </Avatar>
                       </ItemMedia>
                       <ItemContent>
