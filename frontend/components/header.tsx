@@ -7,7 +7,7 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/config/config";
 
 const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 const Header = async () => {
-  let User = {
+  let User: { name: string | null; email: string | null; avatar: string | null } = {
     name: null,
     email: null,
     avatar: null,
