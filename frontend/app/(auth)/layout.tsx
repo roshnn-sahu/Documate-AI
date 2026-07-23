@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Image from "next/image";
-import { HeroGradient } from "@/components/hero-gradient";
+import Link from "next/link";
 
 // Split-screen layout for auth pages (login, signup).
 // Left side: form content, Right side: decorative pattern.
@@ -11,16 +11,17 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="flex w-full flex-col items-center justify-center bg-white p-8 lg:w-[45%]">
         <div className="w-full max-w-[400px]">
           {/* Logo */}
-          <div className="mb-8 flex justify-center ">
+          <Link href="/" className="mb-8 flex justify-center ">
             <Image
               src="/logo.png"
               alt="Logo"
               width={48}
               height={48}
-              className="h-12 w-12 rounded-full border border-neutral-300"
+              className="h-12 w-12 cursor-pointer rounded-full border border-neutral-300"
               priority
+             
             />
-          </div>
+          </Link>
           {children}
         </div>
       </div>
