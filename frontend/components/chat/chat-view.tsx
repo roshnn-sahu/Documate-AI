@@ -15,7 +15,7 @@ import {
 } from "./conversation";
 
 import Message from "./message";
-import AiInput from "./ai-input";
+import AiInput, { type AiInputHandle } from "./ai-input";
 import { sendMessage as sendChatMessage } from "@/lib/services/chat";
 import { ToolsResults } from "@/types/tools-results";
 import { BotIcon } from "lucide-react";
@@ -34,8 +34,8 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
   const [toolLoading, setToolLoading] = useState(false);
   const [toolResult, setToolResult] = useState<ToolsResults | null>(null);
   const [activeTool, setActiveTool] = useState<AIToolType | null>(null);
-
   const bottomRef = useRef<HTMLDivElement>(null);
+  const aiInputRef = useRef<AiInputHandle>(null);
 
   // auto scroll
   useEffect(() => {
@@ -43,6 +43,8 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
       behavior: "smooth",
     });
   }, [messages]);
+
+
 
   const sendMessage = async (message: string, files?: File[]) => {
     if (loading) return;
@@ -229,7 +231,9 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
 
   return (
     <>
-      <div className="relative flex h-full min-h-0 flex-1 flex-col">
+      <div
+        className="relative flex h-full min-h-0 flex-1 flex-col"
+      >
         <HeroGradient />
         {activeTool && (
           <div className="shrink-0 border-b p-4">
@@ -283,9 +287,11 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-4">
           <div className="pointer-events-auto">
-            <AiInput isLoading={loading} onSend={sendMessage} />
+            <AiInput ref={aiInputRef} isLoading={loading} onSend={sendMessage} />
           </div>
         </div>
+
+
       </div>
     </>
   );

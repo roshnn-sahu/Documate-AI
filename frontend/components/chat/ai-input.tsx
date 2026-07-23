@@ -1,5 +1,13 @@
 "use client";
-import { useRef, useState, useEffect, useMemo } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { v4 as uuid } from "uuid";
 import { useRouter } from "next/navigation";
 import { ArrowUpIcon, File, MicIcon, PaperclipIcon, Plus } from "lucide-react";
@@ -52,27 +60,87 @@ const ACCEPT_ATTR = ".pdf,.docx,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp";
 export const title = "AI with Voice";
 interface Props {
   onSend?: (message: string, files: File[]) => void;
-
   loading?: boolean;
 }
 
-const AiInput = ({
-  className = "",
-  onSend,
-  isLoading,
-}: Props & {
-  className?: string;
-  onSend?: (message: string, files: File[]) => void;
-  isLoading?: boolean;
-}) => {
+export interface AiInputHandle {
+  addFiles: (files: File[]) => void;
+}
+
+const AiInput = forwardRef<
+  AiInputHandle,
+  Props & {
+    className?: string;
+    onSend?: (message: string, files: File[]) => void;
+    isLoading?: boolean;
+  }
+>(({ className = "", onSend, isLoading }, ref) => {
   const router = useRouter();
 
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Global drag-and-drop via window-level listeners
+  useEffect(() => {
+    const handleDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      if (e.dataTransfer?.types.includes("Files")) {
+        setIsDragging(true);
+      }
+    };
+
+    const handleDragLeave = (e: DragEvent) => {
+      if (e.relatedTarget === null) {
+        setIsDragging(false);
+      }
+    };
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+    };
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+      const droppedFiles = Array.from(e.dataTransfer?.files || []);
+      if (droppedFiles.length > 0) {
+        const accepted = droppedFiles.filter((f) =>
+          ACCEPTED_TYPES.includes(f.type),
+        );
+        const rejected = droppedFiles.filter(
+          (f) => !ACCEPTED_TYPES.includes(f.type),
+        );
+
+        if (rejected.length > 0) {
+          toast.error(
+            `Unsupported file type: ${rejected.map((f) => f.name).join(", ")}. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP.`,
+          );
+        }
+
+        if (accepted.length > 0) {
+          setFiles((prev) => [...prev, ...accepted]);
+        }
+      }
+    };
+
+    window.addEventListener("dragenter", handleDragEnter);
+    window.addEventListener("dragleave", handleDragLeave);
+    window.addEventListener("dragover", handleDragOver);
+    window.addEventListener("drop", handleDrop);
+
+    return () => {
+      window.removeEventListener("dragenter", handleDragEnter);
+      window.removeEventListener("dragleave", handleDragLeave);
+      window.removeEventListener("dragover", handleDragOver);
+      window.removeEventListener("drop", handleDrop);
+    };
+  }, []);
 
   useEffect(() => {
     const urls = files.map((file) => URL.createObjectURL(file));
@@ -127,9 +195,52 @@ const AiInput = ({
     }
   };
 
+  // Expose addFiles so the parent chat-view can push dropped files in
+  useImperativeHandle(ref, () => ({
+    addFiles: (newFiles: File[]) => {
+      const accepted = newFiles.filter((f) => ACCEPTED_TYPES.includes(f.type));
+      const rejected = newFiles.filter((f) => !ACCEPTED_TYPES.includes(f.type));
+
+      if (rejected.length > 0) {
+        toast.error(
+          `Unsupported file type: ${rejected
+            .map((f) => f.name)
+            .join(
+              ", ",
+            )}. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP.`,
+        );
+      }
+
+      if (accepted.length > 0) {
+        setFiles((prev) => [...prev, ...accepted]);
+      }
+    },
+  }));
+
+  const addFiles = useCallback((newFiles: File[]) => {
+    const accepted = newFiles.filter((f) => ACCEPTED_TYPES.includes(f.type));
+    const rejected = newFiles.filter((f) => !ACCEPTED_TYPES.includes(f.type));
+
+    if (rejected.length > 0) {
+      toast.error(
+        `Unsupported file type: ${rejected.map((f) => f.name).join(", ")}. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP.`,
+      );
+    }
+
+    if (accepted.length > 0) {
+      setFiles((prev) => [...prev, ...accepted]);
+    }
+  }, []);
+
+  // Expose addFiles so the parent chat-view can push dropped files in
+  useImperativeHandle(ref, () => ({ addFiles }));
+
   return (
     <div
-      className={cn("mx-auto flex w-full max-w-2xl flex-col gap-4", className)}
+      className={cn(
+        "relative mx-auto flex w-full max-w-2xl flex-col gap-4",
+        className,
+      )}
     >
       <input
         ref={fileInputRef}
@@ -253,6 +364,43 @@ const AiInput = ({
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>
+
+      {/* Drag-and-drop overlay — matches upload page theme */}
+      {isDragging && (
+        <div className="absolute inset-x-0 bottom-0 z-50 flex justify-center p-4">
+          <div className="animate-in fade-in slide-in-from-bottom-4 w-full max-w-2xl duration-200">
+            <div className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-blue-400 bg-white p-12 text-center shadow-xl dark:border-rose-500 dark:bg-neutral-900">
+              <div className="relative z-10 flex flex-col items-center gap-4">
+                <div className="flex size-16 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50 text-blue-500 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-400">
+                  <svg
+                    className="size-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+                    />
+                  </svg>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-blue-500 dark:text-rose-400">
+                    Drop files here
+                  </p>
+                  <p className="text-xs text-neutral-400 dark:text-neutral-500">
+                    PDF, DOCX, XLSX, TXT, CSV, PNG, JPEG, WEBP &mdash; Max 10 MB
+                    per file
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <small className="text-muted-foreground relative z-10 text-center">
         AI generated answers are derived from your indexed documents{" "}
         <a
@@ -266,6 +414,8 @@ const AiInput = ({
       </small>
     </div>
   );
-};
+});
+
+AiInput.displayName = "AiInput";
 
 export default AiInput;

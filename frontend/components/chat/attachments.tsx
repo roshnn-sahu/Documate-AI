@@ -200,7 +200,7 @@ export const Attachment = forwardRef<HTMLDivElement, AttachmentProps>(
           ref={ref}
           className={cn(
             "group relative",
-            variant === "grid" && "size-24 overflow-hidden rounded-lg",
+            variant === "grid" && "size-24 overflow-hidden rounded-lg border",
             variant === "inline" && [
               "flex h-8 cursor-pointer select-none items-center gap-1.5",
               "rounded-md border border-border px-1.5",
@@ -349,7 +349,7 @@ export const AttachmentRemove = ({
       aria-label={label}
       className={cn(
         variant === "grid" && [
-          "absolute top-2 right-2 size-6 rounded-full p-0",
+          "absolute top-2 right-2 size-6 rounded-full p-0 border  cursor-pointer",
           "bg-background/80 backdrop-blur-sm",
           "opacity-0 transition-opacity group-hover:opacity-100",
           "hover:bg-background",
@@ -425,7 +425,7 @@ export const AttachmentEmpty = ({
 }: AttachmentEmptyProps) => (
   <div
     className={cn(
-      "flex items-center justify-center p-4 text-muted-foreground text-sm",
+      "flex items-center justify-center p-4 text-muted-foreground text-sm border",
       className
     )}
     {...props}
