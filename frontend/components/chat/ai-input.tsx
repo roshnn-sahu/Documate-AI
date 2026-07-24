@@ -367,7 +367,32 @@ const AiInput = forwardRef<
 
       {/* Drag-and-drop overlay — matches upload page theme */}
       {isDragging && (
-        <div className="absolute inset-x-0 bottom-0 z-50 flex justify-center p-4">
+       <ChatDropZone/>
+      )}
+
+      <small className="text-muted-foreground relative z-10 text-center">
+        AI generated answers are derived from your indexed documents{" "}
+        <a
+          className="underline"
+          href="https://docs.pinecone.io/docs/ai-generated-answers"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          verify critical information.
+        </a>
+      </small>
+    </div>
+  );
+});
+
+AiInput.displayName = "AiInput";
+
+export default AiInput;
+
+
+const ChatDropZone =()=>{
+  return(
+     <div className="absolute inset-x-0 bottom-0 z-50 flex justify-center p-4">
           <div className="animate-in fade-in slide-in-from-bottom-4 w-full max-w-2xl duration-200">
             <div className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-blue-400 bg-white p-12 text-center shadow-xl dark:border-rose-500 dark:bg-neutral-900">
               <div className="relative z-10 flex flex-col items-center gap-4">
@@ -399,23 +424,5 @@ const AiInput = forwardRef<
             </div>
           </div>
         </div>
-      )}
-
-      <small className="text-muted-foreground relative z-10 text-center">
-        AI generated answers are derived from your indexed documents{" "}
-        <a
-          className="underline"
-          href="https://docs.pinecone.io/docs/ai-generated-answers"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          verify critical information.
-        </a>
-      </small>
-    </div>
-  );
-});
-
-AiInput.displayName = "AiInput";
-
-export default AiInput;
+  )
+}

@@ -44,8 +44,6 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
     });
   }, [messages]);
 
-
-
   const sendMessage = async (message: string, files?: File[]) => {
     if (loading) return;
     if (!message.trim() && (!files || files.length === 0)) return;
@@ -231,9 +229,7 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
 
   return (
     <>
-      <div
-        className="relative flex h-full min-h-0 flex-1 flex-col"
-      >
+      <div className="relative flex h-full min-h-0 flex-1 flex-col">
         <HeroGradient />
         {activeTool && (
           <div className="shrink-0 border-b p-4">
@@ -287,11 +283,13 @@ export default function ChatView({ sessionId, initialMessages = [] }: Props) {
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 p-4">
           <div className="pointer-events-auto">
-            <AiInput ref={aiInputRef} isLoading={loading} onSend={sendMessage} />
+            <AiInput
+              ref={aiInputRef}
+              isLoading={loading}
+              onSend={sendMessage}
+            />
           </div>
         </div>
-
-
       </div>
     </>
   );

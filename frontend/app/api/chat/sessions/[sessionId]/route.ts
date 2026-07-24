@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 interface Props {
   params: Promise<{
@@ -45,7 +46,7 @@ export async function PATCH(req: Request, { params }: Props) {
   }
 }
 
-// DELETE /api/chat/sessions/[sessionId] — delete a session and its messages
+// DELETE /api/chat/sessions/[sessionId] — delete a session, messages, documents, and embeddings
 export async function DELETE(_req: Request, { params }: Props) {
   try {
     const { sessionId } = await params;
@@ -58,8 +59,29 @@ export async function DELETE(_req: Request, { params }: Props) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Delete messages first, then the session itself
-    // (cascade delete is set up in the migration, but being explicit is safer)
+    // Use admin client to bypass RLS for embedding cleanup
+    const admin = createAdminClient();
+
+    // 1. Delete document chunks (embeddings) for this session
+    //    Chunks are stored with session_id in metadata, not as a FK
+    const { error: chunksError } = await admin
+      .from("document_chunks")
+      .delete()
+      .eq("metadata->>session_id", sessionId);
+
+    if (chunksError) throw chunksError;
+
+    // 2. Delete documents for this session
+    //    After migration 0003, this will cascade to the session
+    const { error: docsError } = await supabase
+      .from("documents")
+      .delete()
+      .eq("session_id", sessionId)
+      .eq("user_id", user.id);
+
+    if (docsError) throw docsError;
+
+    // 3. Delete messages for this session
     const { error: messagesError } = await supabase
       .from("chat_messages")
       .delete()
@@ -68,6 +90,7 @@ export async function DELETE(_req: Request, { params }: Props) {
 
     if (messagesError) throw messagesError;
 
+    // 4. Delete the session itself
     const { error: sessionError } = await supabase
       .from("chat_sessions")
       .delete()

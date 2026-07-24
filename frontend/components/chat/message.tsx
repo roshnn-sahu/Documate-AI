@@ -77,19 +77,24 @@ export default function Message({ role, content, sources, attachments }: Message
         </Attachments>
       )}
 
-      <div className="flex w-full" style={{ justifyContent: role === "user" ? "flex-end" : "flex-start" }}>
+      <div className="flex w-full flex-col gap-2" style={{ alignItems: role === "user" ? "flex-end" : "flex-start" }}>
         {content && (
           <div
             className={cn(
-              "max-w-3xl rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
-
-              role === "user" ? "bg-black text-white" : "bg-background border",
+              "max-w-3xl rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap",
+              role === "user"
+                ? "bg-gradient-to-br from-foreground to-foreground/90 text-background rounded-tr-md"
+                : "bg-card border border-border/50 shadow-sm",
             )}
           >
            <MarkdownRenderer content={content} />
           </div>
         )}
-        {role === "assistant" && sources && <MessageSources sources={sources} />}
+        {role === "assistant" && sources && (
+          <div className="w-full">
+            <MessageSources sources={sources} />
+          </div>
+        )}
       </div>
     </motion.div>
   );
